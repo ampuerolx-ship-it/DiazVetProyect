@@ -7,32 +7,33 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import model.Cliente;
-import model.Mascotas;
+import model.Mascotas; // Asegúrate de usar Mascota (singular)
 import model.Usuario;
 import utilidades.GestorArchivos;
 
 import java.io.File;
-import javafx.scene.paint.Color;
 
 public class PanelRegistroWizard extends StackPane {
 
     private Runnable accionVolver;
     private RegistroTransaccionalController controller;
 
-    // Contenedor de pasos (CardLayout behavior)
+    // Contenedor de pasos
     private StackPane contenedorPasos;
     private VBox paso1Cuenta, paso2Datos, paso3Mascota;
 
-    // DATOS TEMPORALES
+    // DATOS TEMPORALES (Campos del Formulario)
     // Paso 1
-    private TextField txtUser, txtPass;
+    private TextField txtUser;
+    private PasswordField txtPass, txtPassConfirm;
     // Paso 2
-    private TextField txtDni, txtNombre, txtApellido, txtTelefono, txtDireccion;
+    private TextField txtDni, txtNombre, txtApellido, txtTelefono, txtDireccion, txtCorreo;
     private File archivoFotoPerfil;
     private ImageView imgPreviewPerfil;
     // Paso 3
@@ -48,10 +49,9 @@ public class PanelRegistroWizard extends StackPane {
     }
 
     private void initUI() {
-        this.getStyleClass().add("gradient-background"); // Usamos tu estilo CSS
+        this.getStyleClass().add("gradient-background");
         setPadding(new Insets(20));
 
-        // Layout Principal
         VBox mainLayout = new VBox(15);
         mainLayout.setAlignment(Pos.CENTER);
         mainLayout.setMaxWidth(700);
@@ -59,18 +59,18 @@ public class PanelRegistroWizard extends StackPane {
         // Barra Superior
         HBox topBar = new HBox(10);
         Button btnVolver = new Button("← Cancelar");
-        btnVolver.getStyleClass().add("btn-secondary"); // Estilo CSS
+        btnVolver.getStyleClass().add("btn-secondary");
         btnVolver.setOnAction(e -> accionVolver.run());
         topBar.getChildren().add(btnVolver);
 
-        // Contenedor de "Tarjetas"
+        // Contenedor de "Tarjetas" (Pasos)
         contenedorPasos = new StackPane();
         
         paso1Cuenta = crearPaso1();
         paso2Datos = crearPaso2();
         paso3Mascota = crearPaso3();
 
-        // Mostrar solo el primero
+        // Inicialmente solo mostramos el paso 1
         paso2Datos.setVisible(false);
         paso3Mascota.setVisible(false);
 
@@ -87,14 +87,25 @@ public class PanelRegistroWizard extends StackPane {
         txtPass = new PasswordField(); 
         txtPass.setPromptText("Contraseña");
         txtPass.getStyleClass().add("input-modern");
+        
+        txtPassConfirm = new PasswordField();
+        txtPassConfirm.setPromptText("Confirmar Contraseña");
+        txtPassConfirm.getStyleClass().add("input-modern");
 
         Button btnSiguiente = new Button("Siguiente >");
         btnSiguiente.getStyleClass().add("btn-primary");
         btnSiguiente.setOnAction(e -> {
-            if(validarPaso1()) cambiarPaso(paso1Cuenta, paso2Datos);
+            if(validarPaso1()) {
+                cambiarPaso(paso1Cuenta, paso2Datos);
+            }
         });
 
-        card.getChildren().addAll(new Label("Usuario:"), txtUser, new Label("Contraseña:"), txtPass, btnSiguiente);
+        card.getChildren().addAll(
+            new Label("Usuario:"), txtUser, 
+            new Label("Contraseña:"), txtPass, 
+            new Label("Confirmar:"), txtPassConfirm,
+            btnSiguiente
+        );
         return card;
     }
 
@@ -105,13 +116,16 @@ public class PanelRegistroWizard extends StackPane {
         txtDni = crearInput("DNI");
         txtNombre = crearInput("Nombres");
         txtApellido = crearInput("Apellidos");
+        txtCorreo = crearInput("Correo Electrónico");
         txtTelefono = crearInput("Teléfono");
         txtDireccion = crearInput("Dirección");
         
-        // Subida de Foto
+        // Selector de Foto
         Button btnFoto = new Button("Subir Foto Perfil");
         imgPreviewPerfil = new ImageView();
-        imgPreviewPerfil.setFitHeight(50); imgPreviewPerfil.setFitWidth(50);
+        imgPreviewPerfil.setFitHeight(60); 
+        imgPreviewPerfil.setFitWidth(60);
+        imgPreviewPerfil.setPreserveRatio(true);
         
         btnFoto.setOnAction(e -> seleccionarImagen(f -> {
             archivoFotoPerfil = f;
@@ -119,24 +133,32 @@ public class PanelRegistroWizard extends StackPane {
         }));
 
         HBox boxFoto = new HBox(10, btnFoto, imgPreviewPerfil);
+        boxFoto.setAlignment(Pos.CENTER_LEFT);
 
+        // Botones de Navegación
         HBox boxBotones = new HBox(10);
+        boxBotones.setAlignment(Pos.CENTER_RIGHT);
+        
         Button btnAtras = new Button("< Atrás");
         btnAtras.setOnAction(e -> cambiarPaso(paso2Datos, paso1Cuenta));
+        
         Button btnSiguiente = new Button("Siguiente >");
         btnSiguiente.getStyleClass().add("btn-primary");
         btnSiguiente.setOnAction(e -> {
-            if(validarPaso2()) cambiarPaso(paso2Datos, paso3Mascota);
+            if(validarPaso2()) {
+                cambiarPaso(paso2Datos, paso3Mascota);
+            }
         });
         boxBotones.getChildren().addAll(btnAtras, btnSiguiente);
 
         card.getChildren().addAll(
             new Label("DNI:"), txtDni,
-            new Label("Nombre:"), txtNombre,
-            new Label("Apellido:"), txtApellido,
+            new Label("Nombres:"), txtNombre,
+            new Label("Apellidos:"), txtApellido,
+            new Label("Correo:"), txtCorreo,
             new Label("Teléfono:"), txtTelefono,
             new Label("Dirección:"), txtDireccion,
-            new Label("Foto:"), boxFoto,
+            new Label("Foto (Opcional):"), boxFoto,
             boxBotones
         );
         return card;
@@ -147,30 +169,39 @@ public class PanelRegistroWizard extends StackPane {
         VBox card = crearTarjetaBase("Paso 3: Datos de la Mascota");
 
         txtNombreMascota = crearInput("Nombre Mascota");
+        
         comboEspecie = new ComboBox<>();
-        comboEspecie.getItems().addAll("Perro", "Gato", "Otro");
+        comboEspecie.getItems().addAll("Perro", "Gato", "Ave", "Roedor", "Otro");
         comboEspecie.getSelectionModel().selectFirst();
+        comboEspecie.setMaxWidth(Double.MAX_VALUE); // Llenar ancho
+        
         txtRaza = crearInput("Raza");
         txtEdad = crearInput("Edad (Años)");
         txtPeso = crearInput("Peso (Kg)");
 
-        // Foto Mascota
+        // Selector de Foto Mascota
         Button btnFoto = new Button("Foto Mascota");
         imgPreviewMascota = new ImageView();
-        imgPreviewMascota.setFitHeight(50); imgPreviewMascota.setFitWidth(50);
+        imgPreviewMascota.setFitHeight(60); 
+        imgPreviewMascota.setFitWidth(60);
+        imgPreviewMascota.setPreserveRatio(true);
         
         btnFoto.setOnAction(e -> seleccionarImagen(f -> {
             archivoFotoMascota = f;
             imgPreviewMascota.setImage(new Image(f.toURI().toString()));
         }));
         HBox boxFoto = new HBox(10, btnFoto, imgPreviewMascota);
+        boxFoto.setAlignment(Pos.CENTER_LEFT);
 
+        // Botones Finales
         HBox boxBotones = new HBox(10);
+        boxBotones.setAlignment(Pos.CENTER_RIGHT);
+        
         Button btnAtras = new Button("< Atrás");
         btnAtras.setOnAction(e -> cambiarPaso(paso3Mascota, paso2Datos));
         
         Button btnFinalizar = new Button("FINALIZAR REGISTRO");
-        btnFinalizar.getStyleClass().add("btn-save"); // Estilo verde o destacado
+        btnFinalizar.getStyleClass().add("btn-save"); 
         btnFinalizar.setOnAction(e -> procesarRegistroCompleto());
         
         boxBotones.getChildren().addAll(btnAtras, btnFinalizar);
@@ -181,41 +212,50 @@ public class PanelRegistroWizard extends StackPane {
             new Label("Raza:"), txtRaza,
             new Label("Edad:"), txtEdad,
             new Label("Peso:"), txtPeso,
-            new Label("Foto:"), boxFoto,
+            new Label("Foto (Opcional):"), boxFoto,
             boxBotones
         );
         return card;
     }
 
-    // --- LÓGICA DE NEGOCIO ---
+    // --- LÓGICA DE NEGOCIO Y GUARDADO ---
     private void procesarRegistroCompleto() {
-        // 1. Guardar archivos físicamente
-        String rutaPerfil = GestorArchivos.guardarImagen(archivoFotoPerfil, "uploads/profiles");
-        String rutaMascota = GestorArchivos.guardarImagen(archivoFotoMascota, "uploads/pets");
+        if (!validarPaso3()) return;
 
-        // 2. Crear Modelos
+        // 1. Guardar archivos (Si se seleccionaron)
+        String rutaPerfil = (archivoFotoPerfil != null) ? 
+            GestorArchivos.guardarImagen(archivoFotoPerfil, "uploads/profiles") : null;
+            
+        String rutaMascotaImg = (archivoFotoMascota != null) ? 
+            GestorArchivos.guardarImagen(archivoFotoMascota, "uploads/pets") : null;
+
+        // 2. Crear Objeto Cliente
+        // Nota: Asegúrate que tu modelo Cliente tenga este constructor (DNI, Nombres, Apellidos, Correo, Tel, Dir)
         Cliente cliente = new Cliente(
             txtDni.getText(), 
-            txtNombre.getText() + " " + txtApellido.getText(), 
+            txtNombre.getText(), 
+            txtApellido.getText(), 
+            txtCorreo.getText(),
             txtTelefono.getText(), 
             txtDireccion.getText()
         );
 
-        // Nota: En un sistema real, hashea la password aquí
+        // 3. Crear Objeto Usuario
         Usuario usuario = new Usuario(
             txtUser.getText(), 
             txtPass.getText(), 
             txtDni.getText(), 
-            "cliente", 
+            "cliente", // Rol por defecto
             rutaPerfil
         );
 
+        // 4. Crear Objeto Mascota e intentar guardar todo
         try {
             int edad = Integer.parseInt(txtEdad.getText());
             double peso = Double.parseDouble(txtPeso.getText());
             
+            // Constructor: nombre, especie, raza, edad, peso, dniCliente
             Mascotas mascota = new Mascotas(
-                0, // ID autogenerado
                 txtNombreMascota.getText(),
                 comboEspecie.getValue(),
                 txtRaza.getText(),
@@ -223,31 +263,69 @@ public class PanelRegistroWizard extends StackPane {
                 peso,
                 txtDni.getText()
             );
-            mascota.setFotoMascotaRuta(rutaMascota);
+            mascota.setFotoMascotaRuta(rutaMascotaImg);
 
-            // 3. Llamar al Controlador Transaccional
+            // LLAMADA A CONTROLADOR TRANSACCIONAL
             boolean exito = controller.registrarCompleto(usuario, cliente, mascota);
 
             if (exito) {
-                mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "Registro completado. Ahora puede iniciar sesión.");
-                accionVolver.run();
+                mostrarAlerta(Alert.AlertType.INFORMATION, "Registro Exitoso", 
+                    "¡Bienvenido! Su cuenta y su mascota han sido registradas correctamente.");
+                accionVolver.run(); // Volver al Login
             } else {
-                mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se pudo completar el registro. Verifique que el DNI o Usuario no existan.");
+                mostrarAlerta(Alert.AlertType.ERROR, "Error de Registro", 
+                    "No se pudo completar el registro.\nEs posible que el DNI o el Usuario ya existan.");
             }
 
         } catch (NumberFormatException e) {
-            mostrarAlerta(Alert.AlertType.ERROR, "Error", "Edad y Peso deben ser números.");
+            mostrarAlerta(Alert.AlertType.ERROR, "Datos Inválidos", "La Edad y el Peso deben ser números válidos.");
         }
     }
 
+    // --- VALIDACIONES ---
+    
+    private boolean validarPaso1() {
+        if (txtUser.getText().isEmpty() || txtPass.getText().isEmpty()) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Campos Vacíos", "Por favor ingrese usuario y contraseña.");
+            return false;
+        }
+        if (!txtPass.getText().equals(txtPassConfirm.getText())) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Contraseña", "Las contraseñas no coinciden.");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validarPaso2() {
+        if (txtDni.getText().isEmpty() || txtNombre.getText().isEmpty() || txtApellido.getText().isEmpty()) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Datos Incompletos", "DNI, Nombre y Apellido son obligatorios.");
+            return false;
+        }
+        if (!txtDni.getText().matches("\\d+")) { // Solo números
+             mostrarAlerta(Alert.AlertType.WARNING, "DNI Inválido", "El DNI debe contener solo números.");
+             return false;
+        }
+        return true;
+    }
+    
+    private boolean validarPaso3() {
+        if (txtNombreMascota.getText().isEmpty()) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Faltan Datos", "El nombre de la mascota es obligatorio.");
+            return false;
+        }
+        return true;
+    }
+
     // --- UTILIDADES VISUALES ---
+    
     private VBox crearTarjetaBase(String titulo) {
-        VBox card = new VBox(10);
-        card.getStyleClass().add("register-card"); // Tu estilo CSS de tarjeta blanca
+        VBox card = new VBox(15);
+        card.getStyleClass().add("register-card"); // Estilo definido en style.css
         card.setMaxWidth(500);
+        card.setPadding(new Insets(30));
         
         Text t = new Text(titulo);
-        t.setFont(Font.font("Segoe UI", FontWeight.BOLD, 18));
+        t.setFont(Font.font("Segoe UI", FontWeight.BOLD, 20));
         t.setFill(Color.web("#546E7A"));
         
         card.getChildren().add(t);
@@ -268,21 +346,15 @@ public class PanelRegistroWizard extends StackPane {
 
     private void seleccionarImagen(java.util.function.Consumer<File> onSelect) {
         FileChooser fc = new FileChooser();
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Imágenes", "*.jpg", "*.png"));
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Imágenes", "*.jpg", "*.png", "*.jpeg"));
         File f = fc.showOpenDialog(this.getScene().getWindow());
         if (f != null) onSelect.accept(f);
-    }
-    
-    private boolean validarPaso1() {
-        return !txtUser.getText().isEmpty() && !txtPass.getText().isEmpty();
-    }
-    private boolean validarPaso2() {
-        return !txtDni.getText().isEmpty(); // Agregar más validaciones aquí
     }
 
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String msj) {
         Alert alert = new Alert(tipo);
-        alert.setHeaderText(titulo);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
         alert.setContentText(msj);
         alert.showAndWait();
     }

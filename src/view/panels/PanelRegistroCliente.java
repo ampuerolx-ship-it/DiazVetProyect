@@ -1,4 +1,4 @@
-package view.panels;
+/*package view.panels;
 
 import controller.ClienteController;
 import javafx.geometry.Insets;
@@ -92,7 +92,7 @@ public class PanelRegistroCliente extends StackPane {
         HBox.setHgrow(btnGuardar, Priority.ALWAYS); // Que ocupe espacio
         
         btnGuardar.setOnAction(e -> {
-            boolean exito = controller.guardarNuevoCliente(
+            boolean exito = controller.registrarCliente()
                 txtDni.getText(), txtNombre.getText(), txtApellido.getText(),
                 txtTelefono.getText(), txtCorreo.getText(), txtDireccion.getText()
             );
@@ -138,4 +138,4 @@ public class PanelRegistroCliente extends StackPane {
         txtDni.clear(); txtNombre.clear(); txtApellido.clear();
         txtTelefono.clear(); txtCorreo.clear(); txtDireccion.clear();
     }
-}
+}*/

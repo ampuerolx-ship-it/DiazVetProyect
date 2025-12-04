@@ -23,12 +23,13 @@ public class RegistroTransaccionalController {
             conn.setAutoCommit(false); // INICIO TRANSACCIÓN
 
             // 1. REGISTRAR CLIENTE
-            String sqlCliente = "INSERT INTO clientes(dni, nombre, telefono, direccion) VALUES(?,?,?,?)";
+            String sqlCliente = "INSERT INTO clientes(dni, nombres, apellidos, telefono, direccion) VALUES(?,?,?,?)";
             try (PreparedStatement pstC = conn.prepareStatement(sqlCliente)) {
                 pstC.setString(1, cliente.getDni());
-                pstC.setString(2, cliente.getNombre()); // Nombre completo
-                pstC.setString(3, cliente.getTelefono());
-                pstC.setString(4, cliente.getDireccion());
+                pstC.setString(2, cliente.getNombres());
+                pstC.setString(3, cliente.getApellidos());
+                pstC.setString(4, cliente.getTelefono());
+                pstC.setString(5, cliente.getDireccion());
                 pstC.executeUpdate();
             }
 

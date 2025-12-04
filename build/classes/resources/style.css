@@ -1,0 +1,333 @@
+/* style.css - Definición visual para Días Vet */
+
+/* Fuente global para toda la aplicación */
+.root {
+    -fx-font-family: 'Segoe UI', sans-serif;
+    -fx-background-color: #F5F7FA; /* Fondo base por si acaso */
+}
+
+/* --- CAMPOS DE TEXTO (Inputs) --- */
+.input-field {
+    -fx-background-color: transparent;
+    -fx-border-color: #CFD8DC; /* Gris claro */
+    -fx-border-width: 0 0 1 0; /* Solo borde inferior */
+    -fx-font-size: 14px;
+    -fx-text-fill: #546E7A;
+    -fx-padding: 5 0 5 0;
+}
+
+/* Efecto al hacer clic en el campo (Focus) */
+.input-field:focused {
+    -fx-border-color: #90CAF9; /* Azul Pastel al escribir */
+    -fx-border-width: 0 0 2 0; /* La línea se hace un poco más gruesa */
+}
+
+/* --- BOTONES --- */
+.btn-primary {
+    -fx-background-color: #F48FB1; /* Rosa Tenue */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 20; /* Redondeado completo */
+    -fx-cursor: hand;
+    -fx-padding: 10 20;
+}
+
+/* Agrega esto a tu style.css */
+
+.btn-secondary {
+    -fx-background-color: transparent;
+    -fx-border-color: #F48FB1; /* Mismo rosa que el primario */
+    -fx-border-width: 2;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-text-fill: #F48FB1;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-padding: 8 18; /* Un poco menos de padding vertical */
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #FCE4EC; /* Rosa muy pálido al pasar el mouse */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 3, 0, 0, 1);
+}
+
+/* Efecto Hover (cuando el mouse pasa por encima) */
+.btn-primary:hover {
+    -fx-background-color: #F06292; /* Un tono más oscuro */
+    /* Sombra suave para dar efecto de elevación 3D */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 2); 
+}
+
+/* Efecto Click (cuando se presiona) */
+.btn-primary:pressed {
+    -fx-background-color: #AD1457;
+    -fx-translate-y: 1; /* Pequeño movimiento hacia abajo */
+}
+
+/* --- TEXTOS --- */
+.label-titulo {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-fill: #546E7A;
+}
+
+.label-instruccion {
+    -fx-font-size: 14px;
+    -fx-fill: gray;
+}
+
+
+/* --- CALENDARIO Y CITAS --- */
+
+/* Contenedor de celdas del calendario */
+.calendar-grid {
+    -fx-background-color: #E0E0E0; /* Líneas de separación */
+    -fx-padding: 1;
+    -fx-hgap: 1;
+    -fx-vgap: 1;
+}
+
+/* Cada día del mes */
+.calendar-cell {
+    -fx-background-color: white;
+    -fx-padding: 5;
+}
+
+.calendar-cell:hover {
+    -fx-background-color: #F5F7FA; /* Highlight suave al pasar el mouse */
+}
+
+/* Número del día */
+.date-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #78909C;
+    -fx-alignment: top-right;
+}
+
+.date-label-today {
+    -fx-font-weight: bold;
+    -fx-text-fill: #F48FB1; /* Color primario hoy */
+    -fx-font-size: 14px;
+}
+
+/* Etiquetas de Citas (Las "barritas" de colores en el calendario) */
+.event-tag {
+    -fx-background-radius: 4;
+    -fx-padding: 2 5;
+    -fx-font-size: 10px;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+/* Variaciones por prioridad */
+.priority-1 { -fx-background-color: #EF9A9A; } /* Emergencia - Rojo Pastel */
+.priority-2 { -fx-background-color: #FFCC80; } /* Urgencia - Naranja Pastel */
+.priority-3 { -fx-background-color: #90CAF9; } /* Normal - Azul Pastel */
+
+/* Botones de navegación del calendario (Mes, Semana, Día) */
+.toggle-btn {
+    -fx-background-color: white;
+    -fx-border-color: #CFD8DC;
+    -fx-border-radius: 15;
+    -fx-background-radius: 15;
+    -fx-text-fill: #546E7A;
+    -fx-cursor: hand;
+}
+
+.toggle-btn:selected {
+    -fx-background-color: #546E7A;
+    -fx-text-fill: white;
+}
+
+
+/* --- HISTORIAL CLÍNICO --- */
+
+.history-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);
+    -fx-padding: 15;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+}
+
+.history-card:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(144, 202, 249, 0.4), 8, 0, 0, 2); /* Resplandor Azul */
+    -fx-translate-y: -2; /* Pequeña elevación */
+}
+
+/* Etiquetas de estado (Badges) */
+.badge {
+    -fx-padding: 3 8;
+    -fx-background-radius: 15;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.badge-completed {
+    -fx-background-color: #E8F5E9; /* Verde claro */
+    -fx-text-fill: #2E7D32;
+}
+
+.badge-pending {
+    -fx-background-color: #FFF3E0; /* Naranja claro */
+    -fx-text-fill: #EF6C00;
+}
+
+.badge-urgent {
+    -fx-background-color: #FFEBEE; /* Rojo claro */
+    -fx-text-fill: #C62828;
+}
+
+.search-bar {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: #CFD8DC;
+    -fx-padding: 5 15;
+}
+
+/* --- ESTILOS REGISTRO TIPO TARJETA --- */
+
+/* Fondo degradado estilo Instagram/Moderno */
+.gradient-background {
+    -fx-background-color: linear-gradient(to bottom right, #C5CAE9, #F8BBD0, #F48FB1);
+}
+
+/* La tarjeta blanca central */
+.register-card {
+    -fx-background-color: white;
+    -fx-background-radius: 25; /* Bordes muy redondeados */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 20, 0, 0, 10); /* Sombra difusa */
+    -fx-padding: 30;
+}
+
+/* Campos de texto estilo "Cápsula" */
+.input-modern {
+    -fx-background-color: white;
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 8;
+    -fx-font-size: 14px;
+    -fx-text-fill: #757575;
+}
+
+.input-modern:focused {
+    -fx-border-color: #90CAF9; /* Azul suave al seleccionar */
+    -fx-effect: dropshadow(three-pass-box, rgba(144, 202, 249, 0.3), 5, 0, 0, 0);
+}
+
+/* Etiquetas con iconos */
+.label-modern {
+    -fx-text-fill: #546E7A;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 0 0 5 0; /* Espacio abajo */
+}
+
+/* Botón Guardar (Rosa Degradado) */
+.btn-save {
+    -fx-background-color: linear-gradient(to right, #F48FB1, #F06292);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+}
+
+.btn-save:hover {
+    -fx-background-color: linear-gradient(to right, #F06292, #AD1457);
+    -fx-effect: dropshadow(three-pass-box, rgba(240, 98, 146, 0.4), 10, 0, 0, 2);
+}
+
+/* Botón Limpiar (Outline) */
+.btn-clean {
+    -fx-background-color: white;
+    -fx-border-color: #CFD8DC;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: #78909C;
+    -fx-cursor: hand;
+}
+
+
+/* --- ESTILOS LOGIN UPDATE --- */
+
+/* El fondo azul del lado izquierdo */
+.left-panel-blue {
+    -fx-background-color: #90CAF9; /* Azul cielo */
+}
+
+/* La tarjeta blanca donde va el logo (Izquierda) */
+.logo-card {
+    -fx-background-color: white;
+    -fx-background-radius: 30;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);
+    -fx-padding: 40;
+    -fx-alignment: center;
+}
+
+/* La tarjeta del formulario (Derecha) */
+.login-form-card {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 20, 0, 0, 5); /* Sombra suave */
+    -fx-padding: 30;
+    -fx-spacing: 15;
+    -fx-min-width: 320;
+}
+
+/* Inputs redondeados estilo cápsula */
+.input-round {
+    -fx-background-color: white;
+    -fx-border-color: #E3F2FD; /* Borde azul muy claro */
+    -fx-border-width: 1.5;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+    -fx-font-size: 13px;
+    -fx-text-fill: #546E7A;
+}
+
+.input-round:focused {
+    -fx-border-color: #90CAF9; /* Azul al enfocar */
+}
+
+/* Texto de etiquetas pequeñas encima de los inputs */
+.label-small {
+    -fx-text-fill: #90A4AE;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* Botón Rosa Degradado (Ingresar) */
+.btn-login-gradient {
+    -fx-background-color: linear-gradient(to right, #F48FB1, #F06292);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 20;
+    -fx-cursor: hand;
+    -fx-padding: 10 20;
+}
+
+.btn-login-gradient:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(244, 143, 177, 0.4), 10, 0, 0, 2);
+}
+
+/* Botón Crear Cuenta (Borde Rosa) */
+.btn-create-account {
+    -fx-background-color: transparent;
+    -fx-border-color: #F48FB1;
+    -fx-border-radius: 20;
+    -fx-border-width: 1.5;
+    -fx-text-fill: #F48FB1;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-padding: 9 19;
+}

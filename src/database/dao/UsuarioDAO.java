@@ -32,14 +32,11 @@ public class UsuarioDAO {
             if (rs.next()) {
                 // Si encontramos coincidencia, construimos el objeto
                 return new Usuario(
-                    rs.getString("dni"),
-                    rs.getString("username"),
-                    rs.getString("password"),
+                    rs.getString("nickname"),
+                    rs.getString("password_hash"), // O "password" según tu tabla
+                    rs.getString("dni_cliente"),
                     rs.getString("rol"),
-                    rs.getString("nombres"),
-                    rs.getString("apellidos"),
-                    rs.getString("correo"),
-                    rs.getString("telefono")
+                    rs.getString("foto_perfil_ruta")
                 );
             }
         } catch (SQLException e) {
@@ -58,14 +55,11 @@ public class UsuarioDAO {
         try (Connection conn = ConexionDB.conectar();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
-            pstmt.setString(1, u.getDni());
-            pstmt.setString(2, u.getUsername());
-            pstmt.setString(3, u.getPassword());
-            pstmt.setString(4, u.getRol());
-            pstmt.setString(5, u.getNombres());
-            pstmt.setString(6, u.getApellidos());
-            pstmt.setString(7, "correo@ejemplo.com"); // Placeholder o u.getCorreo()
-            pstmt.setString(8, "000-000"); // Placeholder o u.getTelefono()
+            pstmt.setString(1, u.getNickname());
+        pstmt.setString(2, u.getPassword());
+        pstmt.setString(3, u.getDniCliente());
+        pstmt.setString(4, u.getRol());
+        pstmt.setString(5, u.getFotoPerfilRuta());
             
             pstmt.executeUpdate();
             return true;

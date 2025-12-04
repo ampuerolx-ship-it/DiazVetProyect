@@ -7,37 +7,14 @@ import java.sql.Statement;
 
 public class ConexionDB {
 
-    // Nombre del archivo de base de datos (se creará en la raíz del proyecto)
     private static final String URL = "jdbc:sqlite:diasvet.db";
-    private static Connection conexion = null;
 
-    /**
-     * Obtiene la conexión única (Patrón Singleton).
-     * Si no existe o está cerrada, crea una nueva.
-     */
     public static Connection conectar() {
         try {
-            if (conexion == null || conexion.isClosed()) {
-                // Asegúrate de tener la librería sqlite-jdbc en tu proyecto
-                conexion = DriverManager.getConnection(URL);
-                // System.out.println("Conexión a SQLite establecida."); // Descomentar para depuración
-            }
+            return DriverManager.getConnection(URL);
         } catch (SQLException e) {
-            System.err.println("Error al conectar con la BD: " + e.getMessage());
-        }
-        return conexion;
-    }
-
-    /**
-     * Cierra la conexión explícitamente si es necesario.
-     */
-    public static void cerrar() {
-        try {
-            if (conexion != null && !conexion.isClosed()) {
-                conexion.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error en la conexión a SQLite: " + e.getMessage());
+            return null;
         }
     }
 
@@ -45,110 +22,99 @@ public class ConexionDB {
         try (Connection conn = conectar();
              Statement stmt = conn.createStatement()) {
 
-            // ---------------------------------------------------------
-            // A. TABLA USUARIOS (Dueños y Admin)
-            // PK es el DNI para búsquedas rápidas y unicidad lógica.
-            // ---------------------------------------------------------
-            String sqlUsuarios = "CREATE TABLE IF NOT EXISTS usuarios (" +
-                    "dni TEXT PRIMARY KEY, " +     // ID solicitado como DNI
-                    "username TEXT UNIQUE NOT NULL, " +
-                    "password TEXT NOT NULL, " +
-                    "rol TEXT NOT NULL, " +        // 'ADMIN' o 'CLIENTE'
-                    "nombres TEXT, " +
-                    "apellidos TEXT, " +
-                    "correo TEXT, " +
-                    "fecha_nacimiento TEXT, " +
+            // 1. Tabla CLIENTES (Incluye 'correo')
+            String sqlClientes = "CREATE TABLE IF NOT EXISTS clientes (" +
+                    "dni TEXT PRIMARY KEY, " +
+                    "nombre TEXT NOT NULL, " +
                     "telefono TEXT, " +
                     "direccion TEXT, " +
-                    "foto_perfil TEXT" +           // Ruta del archivo de imagen
+                    "correo TEXT" + 
                     ");";
 
-            // ---------------------------------------------------------
-            // B. TABLA MASCOTAS (Pacientes)
-            // Contiene datos filiatorios básicos.
-            // ---------------------------------------------------------
+            // 2. Tabla USUARIOS (Adaptada al nuevo modelo)
+            String sqlUsuarios = "CREATE TABLE IF NOT EXISTS usuarios (" +
+                    "nickname TEXT PRIMARY KEY, " +
+                    "password_hash TEXT NOT NULL, " +
+                    "dni_cliente TEXT NOT NULL, " +
+                    "rol TEXT NOT NULL, " +
+                    "foto_perfil_ruta TEXT, " +
+                    "FOREIGN KEY(dni_cliente) REFERENCES clientes(dni)" +
+                    ");";
+
+            // 3. Tabla MASCOTAS (Incluye ruta foto)
             String sqlMascotas = "CREATE TABLE IF NOT EXISTS mascotas (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "id_dueno TEXT NOT NULL, " +   // FK -> usuarios.dni
                     "nombre TEXT NOT NULL, " +
-                    "especie TEXT NOT NULL, " +
+                    "especie TEXT, " +
                     "raza TEXT, " +
-                    "sexo TEXT, " +                // Macho/Hembra (Visto en img Historia)
-                    "color TEXT, " +               // Visto en img Historia
-                    "fecha_nacimiento TEXT, " +    // Para calcular edad exacta
-                    "caracteristicas TEXT, " +     // Señas particulares
-                    "foto_mascota TEXT, " +
-                    "foto_vacunas TEXT, " +        // Ruta de imagen de carnet
-                    "FOREIGN KEY(id_dueno) REFERENCES usuarios(dni)" +
+                    "edad INTEGER, " +
+                    "peso REAL, " +
+                    "dni_cliente TEXT, " +
+                    "foto_mascota_ruta TEXT, " +
+                    "FOREIGN KEY(dni_cliente) REFERENCES clientes(dni)" +
                     ");";
 
-            // ---------------------------------------------------------
-            // B.2 TABLA ANAMNESIS (Extensión de Mascota)
-            // Soporta los datos fijos de la hoja clínica (Img Anamnesis)
-            // ---------------------------------------------------------
-            String sqlAnamnesis = "CREATE TABLE IF NOT EXISTS anamnesis (" +
-                    "id_mascota INTEGER PRIMARY KEY, " + // 1 a 1 con Mascota
-                    "dieta TEXT, " +
-                    "esterilizado TEXT, " +        // SI/NO
-                    "numero_partos INTEGER, " +
-                    "enfermedades_previas TEXT, " +
-                    "cirugias_previas TEXT, " +
-                    "vacunas_info TEXT, " +
-                    "convive_otros_animales TEXT, " + // SI/NO
-                    "origen_procedencia TEXT, " +
+            // 4. Tabla HISTORIALES (Incluye ruta registro vacunas)
+            String sqlHistoriales = "CREATE TABLE IF NOT EXISTS historiales (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "id_mascota INTEGER NOT NULL, " +
+                    "vacunas_aplicadas TEXT, " +
+                    "vacunas_pendientes TEXT, " +
+                    "ultima_desparasitacion TEXT, " +
+                    "ultima_visita TEXT, " +
+                    "registro_vacunas_ruta TEXT, " +
                     "FOREIGN KEY(id_mascota) REFERENCES mascotas(id)" +
                     ");";
-
-            // ---------------------------------------------------------
-            // C. TABLA CITAS
-            // Gestión de agenda y estados.
-            // ---------------------------------------------------------
+            
+            // 5. Tabla CITAS (Estructura estándar)
             String sqlCitas = "CREATE TABLE IF NOT EXISTS citas (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "id_mascota INTEGER NOT NULL, " +
-                    "fecha_hora TEXT NOT NULL, " + // Formato ISO8601
+                    "fecha_hora TEXT NOT NULL, " +
                     "motivo TEXT, " +
-                    "estado TEXT DEFAULT 'PENDIENTE', " + // PENDIENTE, ATENDIDO, CANCELADO
-                    "prioridad INTEGER DEFAULT 3, " +     // 1=Alta, 2=Media, 3=Baja
-                    "FOREIGN KEY(id_mascota) REFERENCES mascotas(id)" +
+                    "dni_cliente TEXT, " +
+                    "id_mascota INTEGER, " +
+                    "FOREIGN KEY (dni_cliente) REFERENCES clientes(dni), " +
+                    "FOREIGN KEY (id_mascota) REFERENCES mascotas(id)" +
+                    ");";
+            
+            // 6. Tabla PRODUCTOS (Para el PetShop)
+            String sqlProductos = "CREATE TABLE IF NOT EXISTS productos (" +
+                    "codigo TEXT PRIMARY KEY, " +
+                    "nombre TEXT NOT NULL, " +
+                    "descripcion TEXT, " +
+                    "precio REAL, " +
+                    "stock INTEGER" +
                     ");";
 
-            // ---------------------------------------------------------
-            // D. TABLA HISTORIAL_MEDICO (Evolución)
-            // Cada visita o consulta individual.
-            // ---------------------------------------------------------
-            String sqlHistorial = "CREATE TABLE IF NOT EXISTS historial_medico (" +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "id_mascota INTEGER NOT NULL, " +
-                    "fecha TEXT NOT NULL, " +
-                    "hora TEXT, " +
-                    "motivo_consulta TEXT, " +
-                    "sintomas TEXT, " +
-                    "diagnostico TEXT, " +
-                    "tratamiento TEXT, " +
-                    "examenes_auxiliares TEXT, " + // Labs, Rayos X
-                    "veterinario_cargo TEXT, " +
-                    "FOREIGN KEY(id_mascota) REFERENCES mascotas(id)" +
-                    ");";
-
-            // Ejecutar creación
+            // --- EJECUTAR CREACIÓN DE TABLAS ---
+            stmt.execute(sqlClientes);
             stmt.execute(sqlUsuarios);
             stmt.execute(sqlMascotas);
-            stmt.execute(sqlAnamnesis); // Nueva tabla vital para la ficha
+            stmt.execute(sqlHistoriales);
             stmt.execute(sqlCitas);
-            stmt.execute(sqlHistorial);
+            stmt.execute(sqlProductos);
+            
+            // --- ACTUALIZACIONES PARA BASES DE DATOS EXISTENTES (Migraciones) ---
+            // Si el archivo .db ya existía sin estas columnas, esto las agrega sin borrar datos
+            try { stmt.execute("ALTER TABLE clientes ADD COLUMN correo TEXT;"); } catch (SQLException e) {}
+            try { stmt.execute("ALTER TABLE mascotas ADD COLUMN foto_mascota_ruta TEXT;"); } catch (SQLException e) {}
+            try { stmt.execute("ALTER TABLE historiales ADD COLUMN registro_vacunas_ruta TEXT;"); } catch (SQLException e) {}
 
-            // Crear ADMIN por defecto (Clave: admin123)
-            // Nota: Insertamos DNI ficticio '00000000' para el admin sistema
-            String sqlAdmin = "INSERT OR IGNORE INTO usuarios (dni, username, password, rol, nombres, apellidos) " +
-                    "VALUES ('00000000', 'admin', 'admin123', 'ADMIN', 'Super', 'Administrador');";
-            stmt.execute(sqlAdmin);
+            // --- CREACIÓN DEL ADMINISTRADOR POR DEFECTO ---
+            // 1. Primero creamos el "Cliente" ficticio para el admin (por la llave foránea)
+            String sqlAdminCliente = "INSERT OR IGNORE INTO clientes (dni, nombre, telefono, direccion, correo) " +
+                    "VALUES ('00000000', 'Super Administrador', '000000000', 'Sistema', 'admin@diasvet.com');";
+            stmt.execute(sqlAdminCliente);
 
-            System.out.println("Base de datos 'diasvet.db' estructurada correctamente.");
+            // 2. Luego creamos el "Usuario" admin vinculado a ese cliente
+            String sqlAdminUsuario = "INSERT OR IGNORE INTO usuarios (nickname, password_hash, dni_cliente, rol, foto_perfil_ruta) " +
+                    "VALUES ('admin', 'admin123', '00000000', 'admin', null);";
+            stmt.execute(sqlAdminUsuario);
+
+            System.out.println("Base de datos inicializada y verificada correctamente.");
 
         } catch (SQLException e) {
-            System.err.println("Error crítico en BD: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error inicializando BD: " + e.getMessage());
         }
     }
 }

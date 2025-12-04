@@ -22,7 +22,7 @@ import database.dao.UsuarioDAO;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import model.Usuario;
-import view.panels.PanelRegistroCliente;
+import view.panels.PanelRegistroWizard;
 
 public class LoginAppMain extends Application {
     
@@ -190,7 +190,8 @@ public class LoginAppMain extends Application {
             Usuario usuarioLogueado = usuarioDAO.login(user, pass);
             if (usuarioLogueado != null) {
                 mostrarAlerta(Alert.AlertType.INFORMATION, "Acceso Correcto", 
-                              "Bienvenido " + usuarioLogueado.getNombres() + "\nRol: " + usuarioLogueado.getRol());
+                              "Bienvenido " + usuarioLogueado.getNickname() + "\nRol: " + usuarioLogueado.getRol());
+                // TODO: Aquí abrirías el Dashboard (PanelClienteUI o PanelAdminUI)
             } else {
                 mostrarAlerta(Alert.AlertType.ERROR, "Acceso Denegado", "Usuario o contraseña incorrectos.");
             }
@@ -198,10 +199,15 @@ public class LoginAppMain extends Application {
 
         // Lógica Registro
         btnRegistro.setOnAction(e -> {
+            // 1. Definimos la acción "Volver" (Recargar esta pantalla de Login)
             Runnable logicaVolver = () -> this.start(stage);
-            PanelRegistroCliente panelRegistro = new PanelRegistroCliente(logicaVolver);
-            Scene registerScene = new Scene(panelRegistro, 900, 600);
-            cargarCSS(registerScene);
+            
+            // 2. Instanciamos el NUEVO Wizard (No el panel viejo)
+            PanelRegistroWizard panelWizard = new PanelRegistroWizard(logicaVolver);
+            
+            // 3. Cambiamos la escena
+            Scene registerScene = new Scene(panelWizard, 900, 600);
+            cargarCSS(registerScene); // Importante: cargar estilos
             stage.setScene(registerScene);
         });
 

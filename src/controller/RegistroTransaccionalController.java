@@ -36,7 +36,7 @@ public class RegistroTransaccionalController {
 
             // 2. REGISTRAR USUARIO
             // Asumiendo que Usuario.java tiene un método hashPassword o ya viene hasheada
-            String sqlUsuario = "INSERT INTO clientes(nickname, password_hash, dni_cliente, rol, foto_perfil_ruta) VALUES(?,?,?,?,?)";
+            String sqlUsuario = "INSERT INTO usuarios(nickname, password_hash, dni_cliente, rol, foto_perfil_ruta) VALUES(?,?,?,?,?)";
             try (PreparedStatement pstU = conn.prepareStatement(sqlUsuario)) {
                 pstU.setString(1, usuario.getNickname());
                 pstU.setString(2, usuario.getPassword()); 

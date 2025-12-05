@@ -45,29 +45,6 @@ public class UsuarioDAO {
         return null; // Credenciales incorrectas
     }
 
-    /*
-    public boolean registrar(Usuario u) {
-        String sql = "INSERT INTO usuarios (dni, username, password, rol, nombres, apellidos, correo, telefono) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        
-        try (Connection conn = ConexionDB.conectar();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setString(1, u.getNickname());
-        pstmt.setString(2, u.getPassword());
-        pstmt.setString(3, u.getDniCliente());
-        pstmt.setString(4, u.getRol());
-        pstmt.setString(5, u.getFotoPerfilRuta());
-            
-            pstmt.executeUpdate();
-            return true;
-            
-        } catch (SQLException e) {
-            System.err.println("Error al registrar: " + e.getMessage());
-            return false;
-        }
-    }*/
-    
     /**
      * Verifica si un DNI ya existe (Para evitar duplicados)
      */

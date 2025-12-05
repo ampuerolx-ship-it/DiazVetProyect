@@ -25,7 +25,8 @@ public class ConexionDB {
             // 1. Tabla CLIENTES (Incluye 'correo')
             String sqlClientes = "CREATE TABLE IF NOT EXISTS clientes (" +
                     "dni TEXT PRIMARY KEY, " +
-                    "nombre TEXT NOT NULL, " +
+                    "nombres TEXT NOT NULL, " +
+                    "apellidos TEXT NOT NULL, " +
                     "telefono TEXT, " +
                     "direccion TEXT, " +
                     "correo TEXT" + 
@@ -100,18 +101,18 @@ public class ConexionDB {
             try { stmt.execute("ALTER TABLE mascotas ADD COLUMN foto_mascota_ruta TEXT;"); } catch (SQLException e) {}
             try { stmt.execute("ALTER TABLE historiales ADD COLUMN registro_vacunas_ruta TEXT;"); } catch (SQLException e) {}
 
-            // --- CREACIÓN DEL ADMINISTRADOR POR DEFECTO ---
-            // 1. Primero creamos el "Cliente" ficticio para el admin (por la llave foránea)
-            String sqlAdminCliente = "INSERT OR IGNORE INTO clientes (dni, nombre, telefono, direccion, correo) " +
-                    "VALUES ('00000000', 'Super Administrador', '000000000', 'Sistema', 'admin@diasvet.com');";
+            // --- ADMIN POR DEFECTO ---
+            // Creamos el cliente admin ficticio con las nuevas columnas
+            String sqlAdminCliente = "INSERT OR IGNORE INTO clientes (dni, nombres, apellidos, telefono, direccion, correo) " +
+                    "VALUES ('00000000', 'Super', 'Administrador', '000000000', 'Sistema', 'admin@diasvet.com');";
             stmt.execute(sqlAdminCliente);
 
-            // 2. Luego creamos el "Usuario" admin vinculado a ese cliente
+            // Creamos el usuario admin
             String sqlAdminUsuario = "INSERT OR IGNORE INTO usuarios (nickname, password_hash, dni_cliente, rol, foto_perfil_ruta) " +
                     "VALUES ('admin', 'admin123', '00000000', 'admin', null);";
             stmt.execute(sqlAdminUsuario);
 
-            System.out.println("Base de datos inicializada y verificada correctamente.");
+            System.out.println("Base de datos inicializada correctamente.");
 
         } catch (SQLException e) {
             System.err.println("Error inicializando BD: " + e.getMessage());

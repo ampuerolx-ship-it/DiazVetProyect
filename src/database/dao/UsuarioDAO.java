@@ -19,7 +19,7 @@ public class UsuarioDAO {
      * @return Objeto Usuario si es correcto, null si falla.
      */
     public Usuario login(String user, String pass) {
-        String sql = "SELECT * FROM usuarios WHERE username = ? AND password = ?";
+        String sql = "SELECT * FROM usuarios WHERE nickname = ? AND password_hash = ?";
         
         try (Connection conn = ConexionDB.conectar();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -33,7 +33,7 @@ public class UsuarioDAO {
                 // Si encontramos coincidencia, construimos el objeto
                 return new Usuario(
                     rs.getString("nickname"),
-                    rs.getString("password_hash"), // O "password" según tu tabla
+                    rs.getString("password_hash"),
                     rs.getString("dni_cliente"),
                     rs.getString("rol"),
                     rs.getString("foto_perfil_ruta")
@@ -45,9 +45,7 @@ public class UsuarioDAO {
         return null; // Credenciales incorrectas
     }
 
-    /**
-     * Registra un nuevo usuario en la base de datos.
-     */
+    /*
     public boolean registrar(Usuario u) {
         String sql = "INSERT INTO usuarios (dni, username, password, rol, nombres, apellidos, correo, telefono) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -68,16 +66,16 @@ public class UsuarioDAO {
             System.err.println("Error al registrar: " + e.getMessage());
             return false;
         }
-    }
+    }*/
     
     /**
      * Verifica si un DNI ya existe (Para evitar duplicados)
      */
-    public boolean existeUsuario(String dni) {
-        String sql = "SELECT dni FROM usuarios WHERE dni = ?";
+    public boolean existeUsuario(String nickname) {
+        String sql = "SELECT dni FROM usuarios WHERE nickname = ?";
         try (Connection conn = ConexionDB.conectar();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, dni);
+            pstmt.setString(1, nickname);
             ResultSet rs = pstmt.executeQuery();
             return rs.next();
         } catch (SQLException e) {

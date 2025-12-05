@@ -20,10 +20,11 @@ public class RegistroTransaccionalController {
         
         try {
             conn = ConexionDB.conectar();
-            conn.setAutoCommit(false); // INICIO TRANSACCIÓN
+            conn.setAutoCommit(false);
 
             // 1. REGISTRAR CLIENTE
-            String sqlCliente = "INSERT INTO cliente(dni, nombres, apellidos, telefono, direccion) VALUES(?,?,?,?)";
+            String sqlCliente = "INSERT INTO clientes(dni, nombres, apellidos, telefono, direccion) VALUES(?,?,?,?,?)";
+            
             try (PreparedStatement pstC = conn.prepareStatement(sqlCliente)) {
                 pstC.setString(1, cliente.getDni());
                 pstC.setString(2, cliente.getNombres());
@@ -35,12 +36,12 @@ public class RegistroTransaccionalController {
 
             // 2. REGISTRAR USUARIO
             // Asumiendo que Usuario.java tiene un método hashPassword o ya viene hasheada
-            String sqlUsuario = "INSERT INTO usuarios(nickname, password_hash, dni_cliente, rol, foto_perfil_ruta) VALUES(?,?,?,?,?)";
+            String sqlUsuario = "INSERT INTO clientes(nickname, password_hash, dni_cliente, rol, foto_perfil_ruta) VALUES(?,?,?,?,?)";
             try (PreparedStatement pstU = conn.prepareStatement(sqlUsuario)) {
                 pstU.setString(1, usuario.getNickname());
                 pstU.setString(2, usuario.getPassword()); 
-                pstU.setString(3, cliente.getDni()); // FK
-                pstU.setString(4, "cliente");
+                pstU.setString(3, cliente.getDni());
+                pstU.setString(4, "cliente"); // Rol por defecto
                 pstU.setString(5, usuario.getFotoPerfilRuta());
                 pstU.executeUpdate();
             }
@@ -75,6 +76,7 @@ public class RegistroTransaccionalController {
             }
 
             conn.commit(); // CONFIRMAR TRANSACCIÓN
+            System.out.println("Registro transaccional exitoso.");
             return true;
 
         } catch (SQLException e) {

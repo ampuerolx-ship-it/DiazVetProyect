@@ -201,14 +201,19 @@ public class LoginAppMain extends Application {
                     
                     // 3. Establecer la escena en el escenario principal
                     stage.setScene(dashboardScene);
+                    
+                    // Ajustar al tamaño deseado (ej. 1280x800) y centrar
+                    stage.setWidth(1280); 
+                    stage.setHeight(800);
                     stage.centerOnScreen();
+                    
+                    stage.setMaximized(true);
                     stage.show(); // Refrescar
 
                 } catch (IOException ex) {
                     ex.printStackTrace();
                     mostrarAlerta(Alert.AlertType.ERROR, "Error de Carga", "No se pudo abrir el Dashboard: " + ex.getMessage());
                 }
-                // =============================
             } else {
                 mostrarAlerta(Alert.AlertType.ERROR, "Acceso Denegado", "Usuario o contraseña incorrectos.");
             }

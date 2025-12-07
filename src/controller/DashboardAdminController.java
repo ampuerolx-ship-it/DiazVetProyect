@@ -20,6 +20,11 @@ import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
 import javafx.event.ActionEvent;
 import java.io.IOException;
+import java.util.Optional;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.stage.Stage;
 
 public class DashboardAdminController {
     
@@ -58,12 +63,6 @@ public class DashboardAdminController {
         // 3. Configurar las Listas para que se vean bien
         configurarListas();
     }
-    
-    // Acción para el botón Pet Shop
-    @FXML
-    private void mostrarVistaPetShop(ActionEvent event) {
-        cambiarVistaCentral("/view/panels/PanelPetShop.fxml");
-    }
 
     // Método reutilizable para cambiar vistas
     private void cambiarVistaCentral(String fxmlPath) {
@@ -73,8 +72,15 @@ public class DashboardAdminController {
             mainLayout.setCenter(nuevaVista); // Reemplaza el contenido del centro (el Dashboard) por la nueva vista
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Error cargando la vista: " + fxmlPath);
+            // System.err.println("Error cargando la vista: " + fxmlPath);
+            mainLayout.setCenter(new javafx.scene.control.Label("ERROR: No se pudo cargar la vista " + fxmlPath));
         }
+    }
+    
+    // Acción para el botón Pet Shop
+    @FXML
+    private void mostrarVistaPetShop(ActionEvent event) {
+        cambiarVistaCentral("/view/panels/PanelPetShop.fxml");
     }
 
     /**
@@ -171,8 +177,36 @@ public class DashboardAdminController {
     
     @FXML
     private void cerrarSesionClick() {
-        // Aquí iría la lógica para volver al LoginAppMain
-        System.out.println("Cerrando sesión...");
-        // Alerta o cambio de escena
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmar Cierre de Sesión");
+        alert.setHeaderText(null);
+        alert.setContentText("¿Estás seguro de que quieres cerrar la sesión?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            
+            // 1. Obtener la Stage actual (la ventana del Dashboard)
+            Stage dashboardStage = (Stage) mainLayout.getScene().getWindow();
+            dashboardStage.close(); // Cerrar la ventana del Dashboard
+
+            // 2. Opcional: Abrir la ventana de LoginAppMain de nuevo
+            try {
+                // Instanciar la aplicación principal y ejecutarla para iniciar la ventana de login
+                // NOTA: Esto requiere que tu LoginAppMain tenga un método estático o público para iniciar la UI.
+                // Como práctica estándar, recargaremos el FXML del Login.
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/src/LoginApp.fxml")); // Usar la ruta de tu FXML de Login
+                Parent loginRoot = loader.load();
+                
+                Stage loginStage = new Stage();
+                loginStage.setScene(new Scene(loginRoot));
+                loginStage.setTitle("Días Vet - Login");
+                loginStage.show();
+                
+            } catch (IOException e) {
+                e.printStackTrace();
+                // Si falla la recarga, al menos la sesión se cerró.
+            }
+        }
     }
 }

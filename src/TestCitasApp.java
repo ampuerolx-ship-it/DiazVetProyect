@@ -1,4 +1,4 @@
-import javafx.application.Application;
+/*import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import view.panels.PanelCitas;
@@ -26,4 +26,4 @@ public class TestCitasApp extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-}
+}*/

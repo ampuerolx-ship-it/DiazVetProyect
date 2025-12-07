@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.Priority?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.*?>
 
 <HBox spacing="20" style="-fx-padding: 20; -fx-background-color: #F8FAFC;" 
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
@@ -56,9 +57,9 @@
 
         <Separator />
 
-        <HBox alignment="CENTER_BETWEEN">
-            <Label text="Total a Pagar:" textFill="#334155"><font><Font size="16"/></font></Label>
-            <Label fx:id="lblTotal" text="S/ 0.00" textFill="#2E7D32"><font><Font name="System Bold" size="22"/></font></Label>
+        <HBox alignment="CENTER_LEFT"> <Label text="Total a Pagar:" textFill="#334155"><font><Font size="16"/></font></Label>
+    
+            <Region HBox.hgrow="ALWAYS" /> <Label fx:id="lblTotal" text="S/ 0.00" textFill="#2E7D32"><font><Font name="System Bold" size="22"/></font></Label>
         </HBox>
 
         <Button text="CONFIRMAR VENTA ✅" onAction="#finalizarCompra" maxWidth="Infinity"

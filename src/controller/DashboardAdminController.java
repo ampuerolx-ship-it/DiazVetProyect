@@ -185,27 +185,30 @@ public class DashboardAdminController {
         Optional<ButtonType> result = alert.showAndWait();
         
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            
-            // 1. Obtener la Stage actual (la ventana del Dashboard)
-            Stage dashboardStage = (Stage) mainLayout.getScene().getWindow();
-            dashboardStage.close(); // Cerrar la ventana del Dashboard
-
-            // 2. Opcional: Abrir la ventana de LoginAppMain de nuevo
             try {
-                // Instanciar la aplicación principal y ejecutarla para iniciar la ventana de login
-                // NOTA: Esto requiere que tu LoginAppMain tenga un método estático o público para iniciar la UI.
-                // Como práctica estándar, recargaremos el FXML del Login.
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/src/LoginApp.fxml")); // Usar la ruta de tu FXML de Login
-                Parent loginRoot = loader.load();
+                // 1. Obtener y cerrar la ventana actual (Dashboard)
+                Stage currentStage = (Stage) mainLayout.getScene().getWindow();
+                currentStage.close();
+
+                // 2. USAR REFLECTION para cargar "LoginAppMain" sin importarlo
+                // Buscamos la clase por su nombre exacto
+                Class<?> loginClass = Class.forName("LoginAppMain");
                 
-                Stage loginStage = new Stage();
-                loginStage.setScene(new Scene(loginRoot));
-                loginStage.setTitle("Días Vet - Login");
-                loginStage.show();
+                // 3. Crear una nueva instancia de esa clase
+                // Esto equivale a hacer: new LoginAppMain()
+                javafx.application.Application loginApp = (javafx.application.Application) loginClass.getDeclaredConstructor().newInstance();
                 
-            } catch (IOException e) {
+                // 4. Llamar manualmente al método start() con un nuevo Stage
+                Stage newLoginStage = new Stage();
+                loginApp.start(newLoginStage);
+
+            } catch (Exception e) {
                 e.printStackTrace();
-                // Si falla la recarga, al menos la sesión se cerró.
+                // En caso de error, mostramos una alerta
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setTitle("Error");
+                errorAlert.setContentText("No se pudo reiniciar la sesión: " + e.getMessage());
+                errorAlert.show();
             }
         }
     }

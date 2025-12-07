@@ -17,7 +17,9 @@ import java.util.Objects;
 import java.io.IOException;
 import java.net.URL;
 
-// IMPORTACIONES LÓGICAS (No tocamos nada aquí)
+import javafx.application.Application;
+
+
 import database.ConexionDB;
 import database.dao.UsuarioDAO;
 import javafx.scene.image.Image;
@@ -255,6 +257,18 @@ public class LoginAppMain extends Application {
         Alert alert = new Alert(tipo); alert.setTitle(titulo); alert.setHeaderText(null); alert.setContentText(mensaje); alert.showAndWait();
     }
 
+    public static void abrirVentanaLogin() {
+        try {
+            // Creamos una nueva instancia de la aplicación y llamamos a start() manualmente
+            // con un nuevo Stage.
+            LoginAppMain nuevaInstancia = new LoginAppMain();
+            nuevaInstancia.start(new Stage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error al intentar abrir el Login: " + e.getMessage());
+        }
+    }
+    
     public static void main(String[] args) {
         ConexionDB.inicializarBaseDeDatos();
         launch(args);

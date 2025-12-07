@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="800.0" prefWidth="1280.0" styleClass="root-dashboard" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.DashboardAdminController">
+
+    <left>
+        <VBox prefWidth="260.0" spacing="10.0" styleClass="sidebar-container" BorderPane.alignment="CENTER">
+            <padding><Insets bottom="30" left="20" right="20" top="40" /></padding>
+            
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <Circle fill="#90caf9" radius="18.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="2.0" /> 
+                <Label styleClass="h2-subtitle" text="DiazVet Pro" />
+            </HBox>
+            
+            <Separator style="-fx-opacity: 0.5;"><padding><Insets bottom="20" top="20" /></padding></Separator>
+
+            <Label styleClass="menu-section-label" text="PRINCIPAL" />
+            <Button maxWidth="Infinity" styleClass="menu-button, menu-button-active" text="🏠  Dashboard" />
+            <Button maxWidth="Infinity" styleClass="menu-button" text="📅  Citas Médicas" />
+            <Button maxWidth="Infinity" styleClass="menu-button" text="🐾  Pacientes" />
+            <Button maxWidth="Infinity" styleClass="menu-button" text="👥  Clientes" />
+            
+            <Label styleClass="menu-section-label" text="GESTIÓN" />
+            <Button maxWidth="Infinity" styleClass="menu-button" text="📦  Inventario / Stock" />
+            <Button maxWidth="Infinity" styleClass="menu-button" text="🛒  Pet Shop &amp; Ventas" />
+            <Button maxWidth="Infinity" styleClass="menu-button" text="📋  Historias Clínicas" />
+            <Button maxWidth="Infinity" styleClass="menu-button" text="📊  Reportes" />
+
+            <Region VBox.vgrow="ALWAYS" /> <Label styleClass="menu-section-label" text="ADMINISTRACIÓN" />
+            <Button maxWidth="Infinity" styleClass="menu-button" text="⚙️ Configuración" />
+            <Button maxWidth="Infinity" styleClass="menu-button" text="👤 Usuarios y Permisos" />
+            <Button maxWidth="Infinity" style="-fx-text-fill: #EC407A;" styleClass="menu-button" text="🚪 Cerrar Sesión" onAction="#cerrarSesionClick"/>
+        </VBox>
+    </left>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;">
+            <content>
+                <VBox spacing="35.0">
+                    <padding><Insets bottom="40" left="40" right="40" top="40" /></padding>
+
+                    <HBox alignment="CENTER_LEFT">
+                        <VBox>
+                            <Label styleClass="h1-title" text="Hola, Administrador 👋" />
+                            <Label styleClass="stat-label" text="Aquí tienes el resumen de hoy." />
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <HBox alignment="CENTER_RIGHT" spacing="15" style="-fx-background-color: white; -fx-background-radius: 30; -fx-padding: 8 15 8 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10,0,0,2);">
+                             <Circle fill="#F48FB1" radius="20.0" /> <VBox alignment="CENTER_LEFT">
+                                 <Label style="-fx-font-weight: bold;" text="Dr. Juan Pérez" />
+                                 <Label style="-fx-font-size: 11px; -fx-text-fill: gray;" text="Veterinario Principal" />
+                             </VBox>
+                        </HBox>
+                    </HBox>
+
+                    <GridPane hgap="25.0" vgap="25.0">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0" />
+                            <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0" />
+                            <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0" />
+                            <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0" />
+                        </columnConstraints>
+                        <rowConstraints><RowConstraints vgrow="SOMETIMES" /></rowConstraints>
+
+                        <VBox fx:id="cardCitas" styleClass="card-3d">
+                            <HBox alignment="CENTER_LEFT" spacing="15">
+                                <Circle fill="#E3F2FD" radius="22.0" /> <Label styleClass="stat-label" text="Citas Hoy" />
+                            </HBox>
+                            <Label fx:id="lblCitasHoy" styleClass="stat-number" text="18" textFill="#42A5F5">
+                        <VBox.margin><Insets top="15.0" /></VBox.margin></Label>
+                            <Label style="-fx-text-fill: #66BB6A; -fx-font-weight: bold; -fx-font-size: 12px;" text="↑ 12% vs ayer">
+                        <VBox.margin><Insets top="5.0" /></VBox.margin></Label>
+                        </VBox>
+
+                        <VBox fx:id="cardPacientes" styleClass="card-3d" GridPane.columnIndex="1">
+                             <HBox alignment="CENTER_LEFT" spacing="15">
+                                <Circle fill="#FCE4EC" radius="22.0" /> <Label styleClass="stat-label" text="Pacientes Nuevos (Mes)" />
+                            </HBox>
+                            <Label fx:id="lblPacientesNuevos" styleClass="stat-number" text="45" textFill="#EC407A">
+                        <VBox.margin><Insets top="15.0" /></VBox.margin></Label>
+                        </VBox>
+                        
+                        <VBox fx:id="cardVentas" styleClass="card-3d" GridPane.columnIndex="2">
+                             <HBox alignment="CENTER_LEFT" spacing="15">
+                                <Circle fill="#E8F5E9" radius="22.0" /> <Label styleClass="stat-label" text="Ventas del Día (S/.)" />
+                            </HBox>
+                            <Label fx:id="lblVentasDia" styleClass="stat-number" text="1,250.50" textFill="#66BB6A">
+                        <VBox.margin><Insets top="15.0" /></VBox.margin></Label>
+                        </VBox>
+
+                        <VBox fx:id="cardInventario" styleClass="card-3d" GridPane.columnIndex="3">
+                             <HBox alignment="CENTER_LEFT" spacing="15">
+                                <Circle fill="#FFF3E0" radius="22.0" /> <Label styleClass="stat-label" text="Alertas Stock Bajo" />
+                            </HBox>
+                            <Label fx:id="lblAlertasStock" styleClass="stat-number" text="3" textFill="#FFA726">
+                        <VBox.margin><Insets top="15.0" /></VBox.margin></Label>
+                             <Label style="-fx-text-fill: #EF5350; -fx-font-weight: bold; -fx-font-size: 12px;" text="Requiere atención">
+                        <VBox.margin><Insets top="5.0" /></VBox.margin></Label>
+                        </VBox>
+                    </GridPane>
+
+                    <VBox spacing="20">
+                        <Label styleClass="h2-subtitle" text="Accesos Rápidos" />
+                        <GridPane hgap="25.0" vgap="25.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="120.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="120.0" vgrow="SOMETIMES" />
+                            </rowConstraints>
+                            
+                            <Button maxWidth="Infinity" maxHeight="Infinity" styleClass="card-3d-interactive" text="🛒 Nueva Venta PetShop" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #42A5F5; -fx-alignment: CENTER_LEFT;"/>
+                            <Button maxWidth="Infinity" maxHeight="Infinity" styleClass="card-3d-interactive" text="📅 Agendar Cita" GridPane.columnIndex="1" GridPane.rowIndex="0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #EC407A; -fx-alignment: CENTER_LEFT;"/>
+                            <Button maxWidth="Infinity" maxHeight="Infinity" styleClass="card-3d-interactive" text="🐾 Registrar Paciente" GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #66BB6A; -fx-alignment: CENTER_LEFT;"/>
+                            
+                            <Button maxWidth="Infinity" maxHeight="Infinity" styleClass="card-3d-interactive" text="📋 Buscar Historia Clínica" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #7E57C2; -fx-alignment: CENTER_LEFT;"/>
+                            <Button maxWidth="Infinity" maxHeight="Infinity" styleClass="card-3d-interactive" text="📦 Consultar Stock" GridPane.columnIndex="1" GridPane.rowIndex="1" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #FFA726; -fx-alignment: CENTER_LEFT;"/>
+                            <Button maxWidth="Infinity" maxHeight="Infinity" styleClass="card-3d-interactive" text="📊 Ver Reporte Mensual" GridPane.columnIndex="2" GridPane.rowIndex="1" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #78909C; -fx-alignment: CENTER_LEFT;"/>
+                        </GridPane>
+                    </VBox>
+
+                    <HBox spacing="25.0" VBox.vgrow="ALWAYS">
+                        
+                        <VBox spacing="15.0" styleClass="card-3d" HBox.hgrow="ALWAYS" prefWidth="600">
+                             <HBox alignment="CENTER_LEFT">
+                                <Label styleClass="h2-subtitle" text="Próximas Citas" />
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Button text="Ver todas" style="-fx-background-color: transparent; -fx-text-fill: #90CAF9; -fx-cursor: hand;"/>
+                            </HBox>
+                            <ListView fx:id="listProximasCitas" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-border-width: 0;" />
+                        </VBox>
+
+                         <VBox spacing="15.0" styleClass="card-3d" HBox.hgrow="ALWAYS" prefWidth="400">
+                            <Label styleClass="h2-subtitle" text="Actividad Reciente (Tiempo Real)" />
+                            <ListView fx:id="listActividadReciente" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-border-width: 0;" />
+                        </VBox>
+                    </HBox>
+
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

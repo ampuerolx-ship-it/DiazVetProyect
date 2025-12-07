@@ -331,3 +331,104 @@
     -fx-cursor: hand;
     -fx-padding: 9 19;
 }
+
+
+
+/* --- PALETA DE COLORES --- */
+* {
+    -col-primary-blue: #90CAF9;
+    -col-primary-dark-blue: #42A5F5;
+    -col-accent-pink: #F48FB1;
+    -col-accent-dark-pink: #EC407A;
+    -col-bg-light: #F8FAFC; /* Fondo gris muy claro */
+    -col-text-dark: #334155; /* Slate dark */
+    -col-text-muted: #64748B;
+    -col-success: #66BB6A;
+    -col-warning: #FFA726;
+}
+
+.root-dashboard {
+    -fx-background-color: -col-bg-light;
+    -fx-font-family: 'Segoe UI', sans-serif;
+}
+
+/* --- TARJETAS 3D MODERNAS --- */
+/* La clave del efecto 3D suave es un drop-shadow difuminado y grande */
+.card-3d {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    /* Sombra suave: color transparente, radio de difuminado, offset X, offset Y */
+    -fx-effect: dropshadow(three-pass-box, rgba(144, 202, 249, 0.25), 30, 0, 0, 10);
+    -fx-padding: 25;
+}
+
+/* Variante para elementos interactivos que resaltarán más */
+.card-3d-interactive {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 20, 0, 0, 5);
+    -fx-padding: 20;
+}
+
+/* --- TEXTOS Y TÍTULOS --- */
+.h1-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -col-text-dark;
+}
+.h2-subtitle {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -col-text-dark;
+}
+.stat-number {
+    -fx-font-size: 36px;
+    -fx-font-weight: 900;
+}
+.stat-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: -col-text-muted;
+    -fx-font-weight: bold;
+}
+
+/* --- BARRA LATERAL (SIDEBAR) --- */
+.sidebar-container {
+    /* Gradiente sutil vertical de azul a rosa */
+    -fx-background-color: linear-gradient(to bottom, #E3F2FD 0%, #FCE4EC 100%);
+    -fx-background-radius: 0 25 25 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 5, 0);
+}
+
+.menu-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -col-text-dark;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 20;
+    -fx-cursor: hand;
+    -fx-background-radius: 12;
+}
+.menu-button:hover {
+    -fx-background-color: rgba(144, 202, 249, 0.3); /* Azul transparente al pasar el mouse */
+    -fx-text-fill: -col-primary-dark-blue;
+}
+.menu-button-active {
+     -fx-background-color: linear-gradient(to right, -col-primary-blue, -col-primary-dark-blue);
+     -fx-text-fill: white;
+}
+.menu-section-label {
+    -fx-text-fill: -col-text-muted;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 20 0 5 20;
+}
+
+/* --- LISTAS (Actividad Reciente) --- */
+.activity-list-cell {
+    -fx-padding: 10;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #E2E8F0 transparent; /* Solo borde inferior */
+}

@@ -84,7 +84,8 @@ public class ConexionDB {
                     "nombre TEXT NOT NULL, " +
                     "descripcion TEXT, " +
                     "precio REAL, " +
-                    "stock INTEGER" +
+                    "stock INTEGER, " +
+                    "categoria TEXT" + // Ej: Alimento, Juguete, Medicina
                     ");";
 
             // --- EJECUTAR CREACIÓN DE TABLAS ---
@@ -101,6 +102,19 @@ public class ConexionDB {
             try { stmt.execute("ALTER TABLE mascotas ADD COLUMN foto_mascota_ruta TEXT;"); } catch (SQLException e) {}
             try { stmt.execute("ALTER TABLE historiales ADD COLUMN registro_vacunas_ruta TEXT;"); } catch (SQLException e) {}
 
+            try { stmt.execute("ALTER TABLE productos ADD COLUMN categoria TEXT;"); } catch (SQLException e) { 
+                // Esto es normal si la columna ya existe, por eso usamos el try-catch.
+            }
+            
+            // Insertar productos de prueba si la tabla está vacía
+            String sqlDataPrueba = "INSERT OR IGNORE INTO productos (codigo, nombre, descripcion, precio, stock, categoria) VALUES " +
+                    "('P001', 'Croquetas Premium Dog', 'Saco 15kg Adulto', 120.00, 20, 'Alimento')," +
+                    "('P002', 'Juguete Hueso Goma', 'Indestructible', 25.50, 50, 'Juguete')," +
+                    "('P003', 'Pipeta Antipulgas', 'Para perros medianos', 45.00, 100, 'Medicina')," +
+                    "('P004', 'Collar Reflectivo', 'Ajustable rojo', 30.00, 15, 'Accesorio')," +
+                    "('P005', 'Shampoo Hipoalergénico', 'Piel sensible', 35.00, 30, 'Higiene');";
+            stmt.execute(sqlDataPrueba);
+            
             // --- ADMIN POR DEFECTO ---
             // Creamos el cliente admin ficticio con las nuevas columnas
             String sqlAdminCliente = "INSERT OR IGNORE INTO clientes (dni, nombres, apellidos, telefono, direccion, correo) " +

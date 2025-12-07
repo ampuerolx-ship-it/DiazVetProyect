@@ -1,12 +1,12 @@
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -14,6 +14,7 @@ import javafx.animation.FadeTransition;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.util.Objects;
+import java.io.IOException;
 import java.net.URL;
 
 // IMPORTACIONES LÓGICAS (No tocamos nada aquí)
@@ -55,6 +56,7 @@ public class LoginAppMain extends Application {
         ft.setFromValue(0); ft.setToValue(1); ft.play();
 
         primaryStage.show();
+        
     }
 
     // --- PANEL IZQUIERDO (El lado Azul con el Logo en Tarjeta) ---
@@ -189,9 +191,24 @@ public class LoginAppMain extends Application {
             }
             Usuario usuarioLogueado = usuarioDAO.login(user, pass);
             if (usuarioLogueado != null) {
-                mostrarAlerta(Alert.AlertType.INFORMATION, "Acceso Correcto", 
-                              "Bienvenido " + usuarioLogueado.getNickname() + "\nRol: " + usuarioLogueado.getRol());
-                // TODO: Aquí abrirías el Dashboard (PanelClienteUI o PanelAdminUI)
+                try {
+                    // 1. Cargar el FXML del Dashboard
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/DashboardAdmin.fxml"));
+                    Parent dashboardRoot = loader.load();
+                    
+                    // 2. Crear la nueva escena
+                    Scene dashboardScene = new Scene(dashboardRoot);
+                    
+                    // 3. Establecer la escena en el escenario principal
+                    stage.setScene(dashboardScene);
+                    stage.centerOnScreen();
+                    stage.show(); // Refrescar
+
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    mostrarAlerta(Alert.AlertType.ERROR, "Error de Carga", "No se pudo abrir el Dashboard: " + ex.getMessage());
+                }
+                // =============================
             } else {
                 mostrarAlerta(Alert.AlertType.ERROR, "Acceso Denegado", "Usuario o contraseña incorrectos.");
             }

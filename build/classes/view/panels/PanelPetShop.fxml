@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.text.Font?>
+
+<HBox spacing="20" style="-fx-padding: 20; -fx-background-color: #F8FAFC;" 
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="controller.PetShopController">
+
+    <VBox spacing="15" HBox.hgrow="ALWAYS" styleClass="dashboard-card" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 4); -fx-padding: 20;">
+        <Label text="📦 Inventario de Productos" textFill="#334155">
+            <font><Font name="Segoe UI Bold" size="18.0"/></font>
+        </Label>
+        
+        <HBox spacing="10" alignment="CENTER_LEFT">
+             <TextField fx:id="txtPresupuesto" promptText="Tu Presupuesto (S/.)" styleClass="input-round"/>
+             <Button text="✨ Sugerir Pack (IA)" onAction="#sugerirPack" 
+                     style="-fx-background-color: #F48FB1; -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;"/>
+        </HBox>
+
+        <TableView fx:id="tablaStock" VBox.vgrow="ALWAYS" style="-fx-border-color: transparent;">
+            <columns>
+                <TableColumn fx:id="colNombre" text="Producto" prefWidth="200"/>
+                <TableColumn fx:id="colCategoria" text="Categoría" prefWidth="100"/>
+                <TableColumn fx:id="colStock" text="Stock" prefWidth="80"/>
+                <TableColumn fx:id="colPrecio" text="Precio (S/)" prefWidth="100"/>
+            </columns>
+            <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+        </TableView>
+
+        <Button text="Agregar al Carrito ➕" onAction="#agregarAlCarrito" maxWidth="Infinity"
+                style="-fx-background-color: #90CAF9; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 10;"/>
+    </VBox>
+
+    <VBox spacing="15" minWidth="300" prefWidth="350" styleClass="dashboard-card" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 4); -fx-padding: 20;">
+        <Label text="🛒 Carrito de Compras" textFill="#334155">
+            <font><Font name="Segoe UI Bold" size="18.0"/></font>
+        </Label>
+        
+        <ListView fx:id="listaCarrito" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-border-color: #E2E8F0; -fx-border-radius: 5;"/>
+
+        <HBox alignment="CENTER_RIGHT">
+            <Button text="↩ Deshacer (Undo)" onAction="#deshacerAccion" 
+                    style="-fx-background-color: transparent; -fx-text-fill: #64748B; -fx-underline: true; -fx-cursor: hand;"/>
+        </HBox>
+
+        <Separator />
+
+        <HBox alignment="CENTER_BETWEEN">
+            <Label text="Total a Pagar:" textFill="#334155"><font><Font size="16"/></font></Label>
+            <Label fx:id="lblTotal" text="S/ 0.00" textFill="#2E7D32"><font><Font name="System Bold" size="22"/></font></Label>
+        </HBox>
+
+        <Button text="CONFIRMAR VENTA ✅" onAction="#finalizarCompra" maxWidth="Infinity"
+                style="-fx-background-color: linear-gradient(to right, #66BB6A, #43A047); -fx-text-fill: white; -fx-background-radius: 20; -fx-font-size: 14; -fx-padding: 12; -fx-cursor: hand;"/>
+    </VBox>
+
+</HBox>

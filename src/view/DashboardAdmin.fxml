@@ -40,16 +40,16 @@
             <Separator style="-fx-opacity: 0.5;"><padding><Insets bottom="20" top="20" /></padding></Separator>
 
             <Label styleClass="menu-section-label" text="PRINCIPAL" />
-            <Button maxWidth="Infinity" styleClass="menu-button, menu-button-active" text="🏠  Dashboard" />
-            <Button maxWidth="Infinity" styleClass="menu-button" text="📅  Citas Médicas" />
-            <Button maxWidth="Infinity" styleClass="menu-button" text="🐾  Pacientes" />
-            <Button maxWidth="Infinity" styleClass="menu-button" text="👥  Clientes" />
+            <Button maxWidth="Infinity" styleClass="menu-button, menu-button-active" text="🏠  Dashboard" onAction="#mostrarDashboard" />
+            <Button maxWidth="Infinity" styleClass="menu-button" text="📅  Citas Médicas" onAction="#mostrarVistaCitas" />
+            <Button maxWidth="Infinity" styleClass="menu-button" text="🐾  Pacientes" onAction="#mostrarVistaPacientes" />
+            <Button maxWidth="Infinity" styleClass="menu-button" text="👥  Clientes" onAction="#mostrarVistaClientes" />
             
             <Label styleClass="menu-section-label" text="GESTIÓN" />
-            <Button maxWidth="Infinity" styleClass="menu-button" text="📦  Inventario / Stock" />
+            <Button maxWidth="Infinity" styleClass="menu-button" text="📦  Inventario / Stock" onAction="#mostrarVistaInventario" />
             <Button maxWidth="Infinity" styleClass="menu-button" text="🛒  Pet Shop &amp; Ventas" onAction="#mostrarVistaPetShop" />
-            <Button maxWidth="Infinity" styleClass="menu-button" text="📋  Historias Clínicas" />
-            <Button maxWidth="Infinity" styleClass="menu-button" text="📊  Reportes" />
+            <Button maxWidth="Infinity" styleClass="menu-button" text="📋  Historias Clínicas" onAction="#mostrarVistaHistorial" />
+            <Button maxWidth="Infinity" styleClass="menu-button" text="📊  Reportes" onAction="#mostrarReportes" />
 
             <Region VBox.vgrow="ALWAYS" /> <Label styleClass="menu-section-label" text="ADMINISTRACIÓN" />
             <Button maxWidth="Infinity" styleClass="menu-button" text="⚙️ Configuración" />

@@ -1,45 +1,48 @@
 package model;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 public class Cliente {
-    private String dni; // PK
-    private String nombres;
-    private String apellidos;
-    private String correo;
-    private String telefono;
-    private String direccion;
+    private final StringProperty dni;
+    private final StringProperty nombres;
+    private final StringProperty apellidos;
+    private final StringProperty telefono;
+    private final StringProperty direccion;
+    private final StringProperty correo; // Nueva columna en ConexionDB
 
-    // Constructor completo
-    public Cliente(String dni, String nombres, String apellidos, String correo, String telefono, String direccion) {
-        this.dni = dni;
-        this.nombres = nombres;
-        this.apellidos = apellidos;
-        this.correo = correo;
-        this.telefono = telefono;
-        this.direccion = direccion;
+    public Cliente() {
+        this(null, null, null, null, null, null);
     }
 
-    // Constructor vacío (útil para mapeo)
-    public Cliente() {}
-
-    // --- GETTERS ---
-    public String getDni() { return dni; }
-    public String getNombres() { return nombres; }
-    public String getApellidos() { return apellidos; }
-    public String getNombreCompleto() { return nombres + " " + apellidos; }
-    public String getCorreo() { return correo; }
-    public String getTelefono() { return telefono; }
-    public String getDireccion() { return direccion; } // <--- GETTER AGREGADO
-
-    // --- SETTERS ---
-    public void setDni(String dni) { this.dni = dni; }
-    public void setNombres(String nombres) { this.nombres = nombres; }
-    public void setApellidos(String apellidos) { this.apellidos = apellidos; }
-    public void setCorreo(String correo) { this.correo = correo; }
-    public void setTelefono(String telefono) { this.telefono = telefono; }
-    public void setDireccion(String direccion) { this.direccion = direccion; } // <--- SETTER AGREGADO
-    
-    @Override
-    public String toString() {
-        return getNombreCompleto();
+    public Cliente(String dni, String nombres, String apellidos, String telefono, String direccion, String correo) {
+        this.dni = new SimpleStringProperty(dni);
+        this.nombres = new SimpleStringProperty(nombres);
+        this.apellidos = new SimpleStringProperty(apellidos);
+        this.telefono = new SimpleStringProperty(telefono);
+        this.direccion = new SimpleStringProperty(direccion);
+        this.correo = new SimpleStringProperty(correo);
     }
+
+    // --- Properties (Para TableView) ---
+    public StringProperty dniProperty() { return dni; }
+    public StringProperty nombresProperty() { return nombres; }
+    public StringProperty apellidosProperty() { return apellidos; }
+    public StringProperty telefonoProperty() { return telefono; }
+    public StringProperty direccionProperty() { return direccion; }
+    public StringProperty correoProperty() { return correo; }
+
+    // --- Getters and Setters ---
+    public String getDni() { return dni.get(); }
+    public void setDni(String dni) { this.dni.set(dni); }
+    public String getNombres() { return nombres.get(); }
+    public void setNombres(String nombres) { this.nombres.set(nombres); }
+    public String getApellidos() { return apellidos.get(); }
+    public void setApellidos(String apellidos) { this.apellidos.set(apellidos); }
+    public String getTelefono() { return telefono.get(); }
+    public void setTelefono(String telefono) { this.telefono.set(telefono); }
+    public String getDireccion() { return direccion.get(); }
+    public void setDireccion(String direccion) { this.direccion.set(direccion); }
+    public String getCorreo() { return correo.get(); }
+    public void setCorreo(String correo) { this.correo.set(correo); }
 }

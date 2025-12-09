@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CitaController">
+   <content>
+      <VBox spacing="25.0">
+         <padding>
+            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+         </padding>
+         
+         <HBox alignment="CENTER_LEFT">
+            <VBox>
+               <Label styleClass="h1-title" text="📅 Gestión de Citas Médicas" />
+               <Label styleClass="stat-label" text="Agendamiento y manejo de la lista de espera." />
+            </VBox>
+            <Region HBox.hgrow="ALWAYS" />
+         </HBox>
+         
+         <HBox spacing="25.0" VBox.vgrow="ALWAYS">
+            
+            <VBox prefWidth="450.0" spacing="20.0" styleClass="card-3d">
+               <Label fx:id="lblFormTitle" styleClass="h2-subtitle" text="Agendar Nueva Cita" />
+               <GridPane hgap="15.0" vgap="15.0">
+                  <columnConstraints>
+                     <ColumnConstraints hgrow="SOMETIMES" percentWidth="40.0" />
+                     <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0" />
+                  </columnConstraints>
+                  <rowConstraints>
+                     <RowConstraints vgrow="SOMETIMES" />
+                     <RowConstraints vgrow="SOMETIMES" />
+                     <RowConstraints vgrow="SOMETIMES" />
+                     <RowConstraints vgrow="SOMETIMES" />
+                     <RowConstraints vgrow="SOMETIMES" />
+                  </rowConstraints>
+                  
+                  <Label text="Paciente:" GridPane.rowIndex="0" />
+                  <ComboBox fx:id="cmbMascota" maxWidth="Infinity" promptText="Seleccionar Paciente..." GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                  
+                  <Label text="Fecha:" GridPane.rowIndex="1" />
+                  <DatePicker fx:id="dateFecha" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  
+                  <Label text="Hora:" GridPane.rowIndex="2" />
+                  <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                     <TextField fx:id="txtHora" promptText="HH" prefWidth="50" style="-fx-alignment: center;" />
+                     <Label text=":" style="-fx-font-size: 16px;" />
+                     <TextField fx:id="txtMinuto" promptText="MM" prefWidth="50" style="-fx-alignment: center;" />
+                  </HBox>
+                  
+                  <Label text="Prioridad:" GridPane.rowIndex="3" />
+                  <ComboBox fx:id="cmbPrioridad" maxWidth="Infinity" promptText="Seleccionar Nivel..." GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  
+                  <Label text="Motivo:" GridPane.rowIndex="4" />
+                  <TextArea fx:id="txtMotivo" prefHeight="100.0" promptText="Motivo de la consulta..." GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  
+               </GridPane>
+               
+               <Separator />
+               <HBox spacing="10.0" alignment="CENTER_RIGHT">
+                  <Button fx:id="btnEliminar" onAction="#handleEliminar" styleClass="button-danger-outline" text="🗑️ Eliminar" disable="true" />
+                  <Button fx:id="btnLimpiar" onAction="#handleLimpiar" styleClass="btn-secondary-outline" text="Limpiar" />
+                  <Button fx:id="btnGuardar" onAction="#handleGuardar" styleClass="button-success" text="Agendar Cita" />
+               </HBox>
+            </VBox>
+            
+            <VBox HBox.hgrow="ALWAYS" spacing="15.0" styleClass="card-3d">
+               <HBox alignment="CENTER_LEFT" spacing="10.0">
+                  <Label styleClass="h2-subtitle" text="Citas Agendadas para" />
+                  <DatePicker fx:id="dateSelector" onAction="#handleFechaSeleccionada" prefWidth="150" />
+               </HBox>
+               
+               <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+                  <VBox fx:id="listCitasDia" spacing="8.0" />
+               </ScrollPane>
+            </VBox>
+            
+         </HBox>
+         
+      </VBox>
+   </content>
+</ScrollPane>

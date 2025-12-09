@@ -253,6 +253,68 @@ public class PanelRegistroWizard extends StackPane {
         String rutaMascota = (archivoFotoMascota != null) ? 
             GestorArchivos.guardarImagen(archivoFotoMascota, "uploads/pets") : null;
 
+        // 2. Construir Modelos (OJO: El orden de Cliente puede tener un error posicional en el original)
+        String nombreCompleto = txtNombre.getText() + " " + txtApellido.getText();
+        
+        Cliente cliente = new Cliente(
+            txtDni.getText(), 
+            txtNombre.getText(), 
+            txtApellido.getText(), 
+            txtTelefono.getText(),  
+            txtDireccion.getText(), 
+            txtCorreo.getText()
+        );
+
+        Usuario usuario = new Usuario(
+            txtUser.getText(), 
+            txtPass.getText(), 
+            txtDni.getText(), 
+            "cliente", 
+            rutaPerfil
+        );
+
+        try {
+            int edad = Integer.parseInt(txtEdad.getText());
+            double peso = Double.parseDouble(txtPeso.getText());
+            
+            Mascotas mascota = new Mascotas(
+                0, // ID: 0 para inserción (auto-incremento)
+                txtNombreMascota.getText(),
+                comboEspecie.getValue(),
+                txtRaza.getText(),
+                edad,
+                peso,
+                txtDni.getText(), // DNI del Dueño (Cliente)
+                null, // nombreDueno (Se obtiene en el DAO al leer)
+                rutaMascota, // rutaFotoMascota
+                null // fechaRegistro (Se establece en la BD)
+            );
+            // mascota.setFotoMascotaRuta(rutaMascota); // Línea eliminada, ya se pasa en el constructor
+
+            // 3. Transacción
+            boolean exito = controller.registrarCompleto(usuario, cliente, mascota);
+
+            if (exito) {
+                mostrarAlerta(Alert.AlertType.INFORMATION, "¡Registro Exitoso!", 
+                    "Bienvenido a Días Vet.\nSu cuenta ha sido creada correctamente.");
+                accionVolver.run();
+            } else {
+                mostrarAlerta(Alert.AlertType.ERROR, "Error", "El DNI o Usuario ya existen.");
+            }
+
+        } catch (NumberFormatException e) {
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de Formato", "Edad y Peso deben ser numéricos.");
+        }
+    }
+    /*private void procesarRegistroCompleto() {
+        if (!validarPaso3()) return;
+
+        // 1. Guardar archivos
+        String rutaPerfil = (archivoFotoPerfil != null) ? 
+            GestorArchivos.guardarImagen(archivoFotoPerfil, "uploads/profiles") : null;
+        String rutaMascota = (archivoFotoMascota != null) ? 
+            GestorArchivos.guardarImagen(archivoFotoMascota, "uploads/pets") : null;
+
         // 2. Construir Modelos (Concatenando Nombre+Apellido para la BD)
         String nombreCompleto = txtNombre.getText() + " " + txtApellido.getText();
         
@@ -301,7 +363,7 @@ public class PanelRegistroWizard extends StackPane {
         } catch (NumberFormatException e) {
             mostrarAlerta(Alert.AlertType.ERROR, "Error de Formato", "Edad y Peso deben ser numéricos.");
         }
-    }
+    }*/
 
     // =================================================================================
     // UTILIDADES DE UI & DISEÑO
@@ -457,7 +519,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import model.Cliente;
-import model.Mascotas; // Asegúrate de usar Mascota (singular)
+import model.Mascotas; // Asegúrate de usar Mascotas (singular)
 import model.Usuario;
 import utilidades.GestorArchivos;
 
@@ -610,9 +672,9 @@ public class PanelRegistroWizard extends StackPane {
 
     // --- PASO 3: MASCOTA Y FINALIZAR ---
     private VBox crearPaso3() {
-        VBox card = crearTarjetaBase("Paso 3: Datos de la Mascota");
+        VBox card = crearTarjetaBase("Paso 3: Datos de la Mascotas");
 
-        txtNombreMascota = crearInput("Nombre Mascota");
+        txtNombreMascota = crearInput("Nombre Mascotas");
         
         comboEspecie = new ComboBox<>();
         comboEspecie.getItems().addAll("Perro", "Gato", "Ave", "Roedor", "Otro");
@@ -623,8 +685,8 @@ public class PanelRegistroWizard extends StackPane {
         txtEdad = crearInput("Edad (Años)");
         txtPeso = crearInput("Peso (Kg)");
 
-        // Selector de Foto Mascota
-        Button btnFoto = new Button("Foto Mascota");
+        // Selector de Foto Mascotas
+        Button btnFoto = new Button("Foto Mascotas");
         imgPreviewMascota = new ImageView();
         imgPreviewMascota.setFitHeight(60); 
         imgPreviewMascota.setFitWidth(60);
@@ -651,7 +713,7 @@ public class PanelRegistroWizard extends StackPane {
         boxBotones.getChildren().addAll(btnAtras, btnFinalizar);
 
         card.getChildren().addAll(
-            new Label("Nombre Mascota:"), txtNombreMascota,
+            new Label("Nombre Mascotas:"), txtNombreMascota,
             new Label("Especie:"), comboEspecie,
             new Label("Raza:"), txtRaza,
             new Label("Edad:"), txtEdad,
@@ -693,7 +755,7 @@ public class PanelRegistroWizard extends StackPane {
             rutaPerfil
         );
 
-        // 4. Crear Objeto Mascota e intentar guardar todo
+        // 4. Crear Objeto Mascotas e intentar guardar todo
         try {
             int edad = Integer.parseInt(txtEdad.getText());
             double peso = Double.parseDouble(txtPeso.getText());

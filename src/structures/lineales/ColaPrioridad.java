@@ -1,6 +1,9 @@
 package structures.lineales;
 
-// Usamos un tipo genérico <T> para que sirva para Pacientes o cualquier otra cosa en el futuro
+// ⭐ NUEVOS IMPORTS
+import java.util.ArrayList;
+import java.util.List;
+
 public class ColaPrioridad<T> {
 
     // Clase interna Nodo (La "cajita" que guarda el dato)
@@ -29,7 +32,6 @@ public class ColaPrioridad<T> {
         Nodo nuevo = new Nodo(dato, prioridad);
 
         // CASO 1: Cola vacía o el nuevo es más urgente que el primero
-        // (Ej: Llega un perro atropellado (1) y el primero es una vacuna (3))
         if (estaVacia() || prioridad < frente.prioridad) {
             nuevo.siguiente = frente;
             frente = nuevo;
@@ -40,7 +42,6 @@ public class ColaPrioridad<T> {
             
             // Avanzamos mientras haya nodos y el nodo siguiente tenga 
             // igual o mayor urgencia (menor o igual número) que el nuevo.
-            // Esto garantiza estabilidad: si tienen misma prioridad, el nuevo va detrás.
             while (actual.siguiente != null && actual.siguiente.prioridad <= prioridad) {
                 actual = actual.siguiente;
             }
@@ -66,12 +67,31 @@ public class ColaPrioridad<T> {
     public T verFrente() {
         return estaVacia() ? null : frente.dato;
     }
-
+    
+    // Ver si está vacía
     public boolean estaVacia() {
         return frente == null;
     }
-
-    public int getLongitud() {
+    
+    // Ver el tamaño de la cola
+    public int longitud() {
         return longitud;
+    }
+    
+    // ⭐ MÉTODO AÑADIDO: NECESARIO PARA LA UI
+    /**
+     * Devuelve una lista de los elementos en la cola en su orden de prioridad.
+     * Importante: No consume los elementos (no llama a desencolar).
+     * @return List<T> lista de elementos ordenados por prioridad (frente a final).
+     */
+    public List<T> obtenerContenidoOrdenado() {
+        List<T> lista = new ArrayList<>();
+        Nodo actual = frente;
+        
+        while(actual != null) {
+            lista.add(actual.dato);
+            actual = actual.siguiente;
+        }
+        return lista;
     }
 }

@@ -62,7 +62,7 @@ public class RegistroTransaccionalController {
             conn.setAutoCommit(false);
 
             // 1. REGISTRAR CLIENTE
-            String sqlCliente = "INSERT INTO clientes(dni, nombres, apellidos, telefono, direccion) VALUES(?,?,?,?,?,?)";
+            String sqlCliente = "INSERT INTO clientes(dni, nombres, apellidos, telefono, direccion, correo) VALUES(?,?,?,?,?,?)";
             
             try (PreparedStatement pstC = conn.prepareStatement(sqlCliente)) {
                 pstC.setString(1, cliente.getDni());

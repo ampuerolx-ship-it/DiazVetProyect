@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ClienteController">
+   <content>
+      <VBox spacing="25.0">
+         <padding>
+            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+         </padding>
+         
+         <HBox alignment="CENTER_LEFT">
+            <VBox>
+               <Label styleClass="h1-title" text="👥 Gestión de Clientes" />
+               <Label styleClass="stat-label" text="Administración de datos de propietarios de mascotas." />
+            </VBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnNuevo" onAction="#handleNuevo" styleClass="button-primary" text="➕ Nuevo Cliente" />
+         </HBox>
+         
+         <HBox spacing="25.0" VBox.vgrow="ALWAYS">
+            
+            <VBox HBox.hgrow="ALWAYS" prefHeight="600.0" styleClass="card-3d" spacing="15">
+               <Label styleClass="h2-subtitle" text="Lista de Clientes" />
+               <TextField fx:id="txtBuscar" promptText="Buscar por DNI, Nombre o Apellido..." />
+               
+               <TableView fx:id="tableClientes" VBox.vgrow="ALWAYS" styleClass="table-flat">
+                  <columns>
+                     <TableColumn fx:id="colDni" prefWidth="100.0" text="DNI" />
+                     <TableColumn fx:id="colNombres" prefWidth="150.0" text="Nombres" />
+                     <TableColumn fx:id="colApellidos" prefWidth="150.0" text="Apellidos" />
+                     <TableColumn fx:id="colTelefono" prefWidth="100.0" text="Teléfono" />
+                     <TableColumn fx:id="colCorreo" prefWidth="200.0" text="Correo" />
+                  </columns>
+                  <columnResizePolicy>
+                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                  </columnResizePolicy>
+               </TableView>
+            </VBox>
+            
+            <VBox prefWidth="380.0" spacing="20.0" styleClass="card-3d">
+               <Label styleClass="h2-subtitle" text="Detalles del Cliente" />
+               <GridPane hgap="10.0" vgap="10.0">
+                  <columnConstraints>
+                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  </columnConstraints>
+                  <rowConstraints>
+                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  </rowConstraints>
+                  
+                  <Label text="DNI:" GridPane.rowIndex="0" />
+                  <TextField fx:id="txtDni" promptText="8 dígitos" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                  
+                  <Label text="Nombres:" GridPane.rowIndex="1" />
+                  <TextField fx:id="txtNombres" promptText="Primer y segundo nombre" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  
+                  <Label text="Apellidos:" GridPane.rowIndex="2" />
+                  <TextField fx:id="txtApellidos" promptText="Paterno y materno" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  
+                  <Label text="Teléfono:" GridPane.rowIndex="3" />
+                  <TextField fx:id="txtTelefono" promptText="9 dígitos" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  
+                  <Label text="Correo:" GridPane.rowIndex="4" />
+                  <TextField fx:id="txtCorreo" promptText="ejemplo@correo.com" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  
+                  <Label text="Dirección:" GridPane.rowIndex="5" />
+                  <TextField fx:id="txtDireccion" promptText="Dirección completa" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                  
+               </GridPane>
+               
+               <HBox spacing="10.0" alignment="CENTER_RIGHT">
+                  <Button fx:id="btnEliminar" onAction="#handleEliminar" styleClass="button-danger-outline" text="🗑️ Eliminar" disable="true" />
+                  <Button fx:id="btnGuardar" onAction="#handleGuardar" styleClass="button-success" text="💾 Guardar" />
+               </HBox>
+               
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </VBox>
+            
+         </HBox>
+         
+      </VBox>
+   </content>
+</ScrollPane>

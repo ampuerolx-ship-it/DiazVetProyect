@@ -61,13 +61,49 @@ public class DashboardDAO {
                 // Formateo simple para la lista
                 String[] partesFecha = fechaRaw.split("T");
                 String hora = partesFecha.length > 1 ? partesFecha[1] : partesFecha[0];
-                
                 lista.add("🕒 " + hora + " - " + nombre + " (" + motivo + ")");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return lista;
+    }
+    
+    public ObservableList<String> obtenerActividadReciente() {
+        ObservableList<String> actividad = FXCollections.observableArrayList();
+        
+        // Esta consulta une las 3 tablas principales para crear un "Feed" de eventos
+        String sql = "SELECT tipo, descripcion, fecha FROM (" +
+                     "  SELECT 'CITA' as tipo, 'Cita programada: ' || motivo as descripcion, fecha_hora as fecha FROM citas " +
+                     "  UNION ALL " +
+                     "  SELECT 'VENTA' as tipo, 'Venta realizada por S/.' || total as descripcion, fecha_hora as fecha FROM ventas " +
+                     "  UNION ALL " +
+                     "  SELECT 'PACIENTE' as tipo, 'Nuevo paciente: ' || nombre as descripcion, fecha_registro || ' 00:00:00' as fecha FROM mascotas " +
+                     ") ORDER BY fecha DESC LIMIT 15";
+
+        try (Connection conn = ConexionDB.conectar();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                String tipo = rs.getString("tipo");
+                String desc = rs.getString("descripcion");
+                
+                String icono = "";
+                switch (tipo) {
+                    case "CITA": icono = "📅"; break;
+                    case "VENTA": icono = "💰"; break;
+                    case "PACIENTE": icono = "🐾"; break;
+                    default: icono = "🔹";
+                }
+                
+                actividad.add(icono + " " + desc);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            actividad.add("❌ Error cargando actividad");
+        }
+        return actividad;
     }
 
     // Método auxiliar para evitar repetir try-catch en conteos

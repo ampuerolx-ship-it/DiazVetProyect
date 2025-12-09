@@ -6,14 +6,14 @@ package structures.arboles;
 public class NodoAVL<T extends Comparable<T>> {
     
     public T dato;
-    public NodoAVL<T> izquierda;
-    public NodoAVL<T> derecha;
+    public NodoAVL<T> izquierdo;
+    public NodoAVL<T> derecho;
     public int altura; // Importante para el balanceo
     
     public NodoAVL(T dato) {
         this.dato = dato;
         this.altura = 1; // Un nodo nuevo siempre tiene altura 1
-        this.izquierda = null;
-        this.derecha = null;
+        /*this.izquierda = null;
+        this.derecha = null;*/
     }
 }

@@ -2,7 +2,6 @@ package model;
 
 import java.time.LocalDateTime;
 
-// Implementamos Comparable para que el AVL sepa cómo ordenar las citas
 public class Cita implements Comparable<Cita> {
     
     private String idCita; // Usaremos un ID único
@@ -18,9 +17,25 @@ public class Cita implements Comparable<Cita> {
         this.tipoCita = tipoCita;
     }
 
-    // -----------------------------------------------------------------
-    // GETTERS AGREGADOS (Acceso de lectura a la Vista y Controlador)
-    // -----------------------------------------------------------------
+    /**
+     * Devuelve la prioridad de la cita para el Triage visual.
+     * 1 = Alta (Emergencia) - Rojo
+     * 2 = Media (Urgencia/Cirugía) - Naranja/Amarillo
+     * 3 = Baja (Control/Vacuna/Normal) - Azul/Verde
+     */
+    public int getNivelPrioridad() {
+        if (tipoCita == null) return 3;
+        
+        String tipo = tipoCita.toLowerCase();
+        
+        if (tipo.contains("emergencia") || tipo.contains("atropello") || tipo.contains("grave")) {
+            return 1; // Prioridad Alta
+        } else if (tipo.contains("urgente") || tipo.contains("cirugía") || tipo.contains("gestación")) {
+            return 2; // Prioridad Media
+        } else {
+            return 3; // Prioridad Baja (Vacunas, Baños, Controles)
+        }
+    }
     
     public String getIdCita() {
         return idCita;
@@ -44,15 +59,10 @@ public class Cita implements Comparable<Cita> {
      */
     @Override
     public int compareTo(Cita otraCita) {
-        // 1. Comparar por Fecha y Hora
         int resultadoFecha = this.fechaHora.compareTo(otraCita.fechaHora);
-        
-        // 2. Si las fechas son diferentes, retornar el resultado
         if (resultadoFecha != 0) {
             return resultadoFecha;
         }
-        
-        // 3. Si las fechas son iguales, desempatar por ID de Cita
         return this.idCita.compareTo(otraCita.idCita);
     }
 }

@@ -1,5 +1,6 @@
 package controller;
 
+import database.dao.CitaDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Paciente;
@@ -9,49 +10,54 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import model.Cita;
 
 public class CitaController {
 
+    private final CitaDAO citaDAO;
     // Lista temporal para simular base de datos
-    private List<CitaSimulada> baseDatosCitas;
+    private List<Cita> cacheCitas;
 
     public CitaController() {
-        baseDatosCitas = new ArrayList<>();
-        cargarDatosPrueba();
+        this.citaDAO = new CitaDAO();
+        refrescarDatos();
     }
 
-    // Clase auxiliar interna solo para visualización
-    public static class CitaSimulada {
-        public Paciente paciente;
-        public LocalDate fecha;
-        public LocalTime hora;
-
-        public CitaSimulada(Paciente p, LocalDate f, LocalTime h) {
-            this.paciente = p; this.fecha = f; this.hora = h;
-        }
+    public void refrescarDatos() {
+        this.cacheCitas = citaDAO.listarCitasFuturas();
     }
 
-    private void cargarDatosPrueba() {
-        // Creamos citas para HOY y MAÑANA para probar las vistas
-        LocalDate hoy = LocalDate.now();
+    /**
+     * Filtra las citas cargadas por mes y año.
+     */
+    public List<Cita> obtenerCitasDelMes(int year, int month) {
+        if (cacheCitas == null) refrescarDatos();
         
-        baseDatosCitas.add(new CitaSimulada(new Paciente("Bobby", "Perro", "Juan", "123", "Vacuna", 3), hoy, LocalTime.of(9, 0)));
-        baseDatosCitas.add(new CitaSimulada(new Paciente("Michi", "Gato", "Ana", "456", "Emergencia", 1), hoy, LocalTime.of(10, 30)));
-        baseDatosCitas.add(new CitaSimulada(new Paciente("Rex", "Perro", "Luis", "789", "Revisión", 2), hoy.plusDays(1), LocalTime.of(15, 0)));
-        baseDatosCitas.add(new CitaSimulada(new Paciente("Nemo", "Pez", "Dory", "000", "Control", 3), hoy.minusDays(2), LocalTime.of(11, 0)));
-    }
-
-    // Método que usará la UI para pedir citas de un mes específico
-    public List<CitaSimulada> obtenerCitasDelMes(int year, int month) {
-        return baseDatosCitas.stream()
-                .filter(c -> c.fecha.getYear() == year && c.fecha.getMonthValue() == month)
+        return cacheCitas.stream()
+                .filter(c -> c.getFechaHora().getYear() == year && 
+                             c.getFechaHora().getMonthValue() == month)
                 .collect(Collectors.toList());
     }
 
-    // Método para citas de un día específico
-    public List<CitaSimulada> obtenerCitasDelDia(LocalDate fecha) {
-        return baseDatosCitas.stream()
-                .filter(c -> c.fecha.equals(fecha))
+    /**
+     * Filtra las citas cargadas por un día específico.
+     */
+    public List<Cita> obtenerCitasDelDia(LocalDate fecha) {
+        if (cacheCitas == null) refrescarDatos();
+
+        return cacheCitas.stream()
+                .filter(c -> c.getFechaHora().toLocalDate().equals(fecha))
                 .collect(Collectors.toList());
+    }
+    
+    /**
+     * Método para registrar nueva cita desde la UI.
+     */
+    public boolean agendarCita(Cita nuevaCita, int idMascotaReal) {
+        boolean exito = citaDAO.registrarCita(nuevaCita, idMascotaReal);
+        if (exito) {
+            refrescarDatos(); // Actualizar caché inmediatamente
+        }
+        return exito;
     }
 }

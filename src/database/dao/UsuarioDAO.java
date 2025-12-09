@@ -11,7 +11,6 @@ import model.Mascotas;
 import model.Paciente;
 import model.Usuario;
 
-
 public class UsuarioDAO {
 
     /**

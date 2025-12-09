@@ -9,251 +9,156 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import model.Cita;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 public class PanelCitas extends BorderPane {
 
-    private CitaController controller;
-    private YearMonth currentYearMonth;
-    private LocalDate selectedDate;
-    
-    // Contenedor central cambiante
-    private StackPane contentArea;
-    private ToggleGroup viewToggleGroup;
+    private final CitaController controller;
+    private LocalDate fechaSeleccionada;
+    private Label lblFechaTitulo;
+    private VBox contenedorHorario; 
 
     public PanelCitas() {
         this.controller = new CitaController();
-        this.currentYearMonth = YearMonth.now();
-        this.selectedDate = LocalDate.now();
-
+        this.fechaSeleccionada = LocalDate.now();
         initUI();
+        cargarCitas();
     }
 
     private void initUI() {
         setPadding(new Insets(20));
         setStyle("-fx-background-color: #F5F7FA;");
-
-        // 1. TOP BAR (Título y Navegación)
-        HBox topBar = crearBarraSuperior();
-        setTop(topBar);
-
-        // 2. AREA CENTRAL (Donde se renderiza Mes/Semana/Día)
-        contentArea = new StackPane();
-        contentArea.setPadding(new Insets(20, 0, 0, 0));
-        setCenter(contentArea);
-
-        // Por defecto mostramos MES
-        mostrarVistaMes();
+        setTop(crearBarraSuperior());
+        
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
+        contenedorHorario = new VBox(10);
+        contenedorHorario.setPadding(new Insets(10, 0, 10, 0));
+        scrollPane.setContent(contenedorHorario);
+        setCenter(scrollPane);
     }
 
     private HBox crearBarraSuperior() {
-        HBox header = new HBox(20);
-        header.setAlignment(Pos.CENTER_LEFT);
+        HBox topBar = new HBox(15);
+        topBar.setAlignment(Pos.CENTER_LEFT);
+        topBar.setPadding(new Insets(0, 0, 20, 0));
 
-        // Título
-        VBox titleBox = new VBox(2);
-        Text title = new Text("Calendario de Citas");
-        title.setFont(Font.font("Segoe UI", FontWeight.BOLD, 24));
-        title.setFill(Color.web("#546E7A"));
+        Button btnHoy = new Button("Hoy");
+        btnHoy.setStyle("-fx-background-color: white; -fx-text-fill: #546E7A; -fx-border-color: #CFD8DC; -fx-cursor: hand;");
+        btnHoy.setOnAction(e -> { fechaSeleccionada = LocalDate.now(); actualizarTitulo(); cargarCitas(); });
+
+        Button btnAnterior = new Button("◀");
+        btnAnterior.setOnAction(e -> { fechaSeleccionada = fechaSeleccionada.minusDays(1); actualizarTitulo(); cargarCitas(); });
         
-        Text subtitle = new Text("Gestiona y visualiza la agenda de Días Vet");
-        subtitle.setFill(Color.GRAY);
-        titleBox.getChildren().addAll(title, subtitle);
+        Button btnSiguiente = new Button("▶");
+        btnSiguiente.setOnAction(e -> { fechaSeleccionada = fechaSeleccionada.plusDays(1); actualizarTitulo(); cargarCitas(); });
+
+        lblFechaTitulo = new Label();
+        lblFechaTitulo.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #37474F;");
+        actualizarTitulo();
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        // Botones de cambio de vista (Mes / Día)
-        viewToggleGroup = new ToggleGroup();
         
-        ToggleButton btnMes = new ToggleButton("Mes");
-        btnMes.getStyleClass().add("toggle-btn");
-        btnMes.setToggleGroup(viewToggleGroup);
-        btnMes.setSelected(true);
-        btnMes.setOnAction(e -> mostrarVistaMes());
-
-        ToggleButton btnDia = new ToggleButton("Día");
-        btnDia.getStyleClass().add("toggle-btn");
-        btnDia.setToggleGroup(viewToggleGroup);
-        btnDia.setOnAction(e -> mostrarVistaDia());
-
-        HBox controls = new HBox(10, btnMes, btnDia);
-        controls.setAlignment(Pos.CENTER);
-
-        header.getChildren().addAll(titleBox, spacer, controls);
-        return header;
+        Button btnNuevaCita = new Button("+ Nueva Cita");
+        btnNuevaCita.setStyle("-fx-background-color: #42A5F5; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
+        
+        topBar.getChildren().addAll(btnHoy, btnAnterior, lblFechaTitulo, btnSiguiente, spacer, btnNuevaCita);
+        return topBar;
     }
 
-    // ==========================================
-    // LOGICA VISTA MES (Cuadrícula Clásica)
-    // ==========================================
-    private void mostrarVistaMes() {
-        contentArea.getChildren().clear();
-
-        VBox layout = new VBox(10);
-        
-        // Cabecera del Mes (Ej: "Diciembre 2025")
-        HBox navBar = new HBox(15);
-        navBar.setAlignment(Pos.CENTER_LEFT);
-        Button btnPrev = new Button("<");
-        Button btnNext = new Button(">");
-        
-        String fechaFormateada = currentYearMonth.format(
-            DateTimeFormatter.ofPattern("MMMM yyyy")
-                .withLocale(new java.util.Locale("es", "ES"))
-        );
-        Text monthTitle = new Text(fechaFormateada.toUpperCase());
-        
-        monthTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 18));
-        
-        btnPrev.setOnAction(e -> { currentYearMonth = currentYearMonth.minusMonths(1); mostrarVistaMes(); });
-        btnNext.setOnAction(e -> { currentYearMonth = currentYearMonth.plusMonths(1); mostrarVistaMes(); });
-        
-        navBar.getChildren().addAll(btnPrev, monthTitle, btnNext);
-
-        // Grilla de días
-        GridPane calendarGrid = new GridPane();
-        calendarGrid.getStyleClass().add("calendar-grid");
-        calendarGrid.setPrefSize(800, 600);
-        
-        
-        // Columnas (Lunes a Domingo)
-        String[] diasSemana = {"Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"};
-        for (int i = 0; i < 7; i++) {
-            Label lbl = new Label(diasSemana[i]);
-            lbl.setMaxWidth(Double.MAX_VALUE);
-            lbl.setAlignment(Pos.CENTER);
-            lbl.setPadding(new Insets(5));
-            calendarGrid.add(lbl, i, 0);
-            
-            ColumnConstraints col = new ColumnConstraints();
-            col.setPercentWidth(100.0 / 7);
-            calendarGrid.getColumnConstraints().add(col);
-        }
-
-        // Llenar días
-        LocalDate primerDiaDelMes = currentYearMonth.atDay(1);
-        int dayOfWeek = primerDiaDelMes.getDayOfWeek().getValue(); // 1 = Lunes
-        int daysInMonth = currentYearMonth.lengthOfMonth();
-
-        int row = 1;
-        int col = dayOfWeek - 1; // Ajuste índice 0
-
-        // Obtener citas del mes desde Controller
-        List<CitaController.CitaSimulada> citasMes = controller.obtenerCitasDelMes(currentYearMonth.getYear(), currentYearMonth.getMonthValue());
-
-        for (int i = 1; i <= daysInMonth; i++) {
-            LocalDate date = currentYearMonth.atDay(i);
-            VBox cell = new VBox(2);
-            cell.getStyleClass().add("calendar-cell");
-            cell.setMinHeight(80); // Altura de celda
-
-            Label dateLbl = new Label(String.valueOf(i));
-            dateLbl.getStyleClass().add("date-label");
-            if(date.equals(LocalDate.now())) dateLbl.getStyleClass().add("date-label-today");
-
-            cell.getChildren().add(dateLbl);
-
-            // Agregar citas a la celda visualmente
-            for (CitaController.CitaSimulada cita : citasMes) {
-                if (cita.fecha.getDayOfMonth() == i) {
-                    Label eventTag = new Label(cita.hora + " " + cita.paciente.getNombre());
-                    eventTag.getStyleClass().addAll("event-tag", "priority-" + cita.paciente.getNivelPrioridad());
-                    eventTag.setMaxWidth(Double.MAX_VALUE);
-                    cell.getChildren().add(eventTag);
-                }
-            }
-
-            calendarGrid.add(cell, col, row);
-
-            col++;
-            if (col > 6) {
-                col = 0;
-                row++;
-            }
-        }
-        
-        layout.getChildren().addAll(navBar, calendarGrid);
-        contentArea.getChildren().add(layout);
+    private void actualizarTitulo() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM", new Locale("es", "ES"));
+        String texto = fechaSeleccionada.format(formatter);
+        lblFechaTitulo.setText(texto.substring(0, 1).toUpperCase() + texto.substring(1));
     }
 
-    // ==========================================
-    // LOGICA VISTA DIA (Timeline Vertical)
-    // ==========================================
-    private void mostrarVistaDia() {
-        contentArea.getChildren().clear();
-        
-        VBox layout = new VBox(10);
-        
-        // Navegación día
-        HBox navBar = new HBox(15);
-        navBar.setAlignment(Pos.CENTER_LEFT);
-        Button btnPrev = new Button("<");
-        Button btnNext = new Button(">");
-        Text dayTitle = new Text(selectedDate.format(DateTimeFormatter.ofPattern("EEEE dd 'de' MMMM").withLocale(new java.util.Locale("es", "ES"))));
-        dayTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 18));
-        
-        btnPrev.setOnAction(e -> { selectedDate = selectedDate.minusDays(1); mostrarVistaDia(); });
-        btnNext.setOnAction(e -> { selectedDate = selectedDate.plusDays(1); mostrarVistaDia(); });
+    public void cargarCitas() {
+        contenedorHorario.getChildren().clear();
+        List<Cita> citasDelDia = controller.obtenerCitasDelDia(fechaSeleccionada);
 
-        navBar.getChildren().addAll(btnPrev, dayTitle, btnNext);
+        LocalTime horaInicio = LocalTime.of(8, 0);
+        LocalTime horaFin = LocalTime.of(20, 0);
 
-        // ScrollPane para el Timeline
-        ScrollPane scroll = new ScrollPane();
-        scroll.setFitToWidth(true);
-        VBox timeline = new VBox(0); // Espacio entre horas
-        
-        List<CitaController.CitaSimulada> citasDia = controller.obtenerCitasDelDia(selectedDate);
-
-        // Horas de 8:00 a 20:00
-        for (int hour = 8; hour <= 20; hour++) {
-            HBox hourRow = new HBox(10);
-            hourRow.setPadding(new Insets(10));
-            hourRow.setStyle("-fx-border-color: #EEEEEE; -fx-border-width: 0 0 1 0;"); // Línea divisoria
-            hourRow.setMinHeight(60);
-
-            Label timeLbl = new Label(String.format("%02d:00", hour));
-            timeLbl.setMinWidth(50);
-            timeLbl.setTextFill(Color.GRAY);
-
-            VBox eventsContainer = new VBox(5);
+        while (horaInicio.isBefore(horaFin)) {
+            HBox filaHora = new HBox(15);
+            filaHora.setAlignment(Pos.TOP_LEFT);
+            filaHora.setMinHeight(70); 
             
-            // Buscar citas en esta hora
-            int currentHour = hour;
-            citasDia.stream()
-                .filter(c -> c.hora.getHour() == currentHour)
-                .forEach(c -> {
-                    HBox card = new HBox(10);
-                    card.setPadding(new Insets(8));
-                    card.setStyle("-fx-background-color: white; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 3, 0, 0, 1);");
-                    
-                    // Indicador de color según prioridad
-                    Region colorBar = new Region();
-                    colorBar.setMinWidth(4);
-                    String color = c.paciente.getNivelPrioridad() == 1 ? "#EF9A9A" : (c.paciente.getNivelPrioridad() == 2 ? "#FFCC80" : "#90CAF9");
-                    colorBar.setStyle("-fx-background-color: " + color + ";");
+            Label lblHora = new Label(horaInicio.format(DateTimeFormatter.ofPattern("hh:mm a")));
+            lblHora.setMinWidth(70);
+            lblHora.setAlignment(Pos.TOP_RIGHT);
+            lblHora.setStyle("-fx-text-fill: #90A4AE; -fx-font-size: 12px; -fx-padding: 5 0 0 0;");
 
-                    VBox info = new VBox(2);
-                    Text name = new Text(c.paciente.getNombre() + " (" + c.paciente.getEspecie() + ")");
-                    name.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
-                    Text owner = new Text("Dueño: " + c.paciente.getDniDueno());
-                    owner.setFill(Color.GRAY);
-                    
-                    info.getChildren().addAll(name, owner);
-                    card.getChildren().addAll(colorBar, info);
-                    eventsContainer.getChildren().add(card);
-                });
+            VBox contenedorEventos = new VBox(5);
+            HBox.setHgrow(contenedorEventos, Priority.ALWAYS);
+            final int horaActual = horaInicio.getHour();
+            
+            citasDelDia.stream()
+                .filter(c -> c.getFechaHora().getHour() == horaActual)
+                .forEach(cita -> contenedorEventos.getChildren().add(crearTarjetaCita(cita)));
 
-            hourRow.getChildren().addAll(timeLbl, eventsContainer);
-            timeline.getChildren().add(hourRow);
+            if (contenedorEventos.getChildren().isEmpty()) {
+                Region linea = new Region();
+                linea.setMaxHeight(1);
+                linea.setStyle("-fx-background-color: #ECEFF1;");
+                HBox.setHgrow(linea, Priority.ALWAYS);
+                VBox ph = new VBox(linea);
+                ph.setAlignment(Pos.CENTER_LEFT);
+                HBox.setHgrow(ph, Priority.ALWAYS);
+                filaHora.getChildren().addAll(lblHora, ph);
+            } else {
+                filaHora.getChildren().addAll(lblHora, contenedorEventos);
+            }
+            contenedorHorario.getChildren().add(filaHora);
+            horaInicio = horaInicio.plusHours(1);
         }
+    }
 
-        scroll.setContent(timeline);
-        layout.getChildren().addAll(navBar, scroll);
-        contentArea.getChildren().add(layout);
+    private HBox crearTarjetaCita(Cita cita) {
+        HBox tarjeta = new HBox(0);
+        tarjeta.setStyle("-fx-background-color: white; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 3, 0, 0, 1);");
+        
+        // 1. BARRA DE PRIORIDAD (Usando el nuevo método getNivelPrioridad)
+        Region barraColor = new Region();
+        barraColor.setMinWidth(5);
+        
+        int nivel = cita.getNivelPrioridad(); // ⬅️ AQUÍ USAMOS TU REQUERIMIENTO
+        String colorHex;
+        
+        switch (nivel) {
+            case 1: colorHex = "#EF5350"; break; // Alta (Rojo)
+            case 2: colorHex = "#FFA726"; break; // Media (Naranja)
+            default: colorHex = "#66BB6A"; break; // Baja (Verde)
+        }
+        barraColor.setStyle("-fx-background-color: " + colorHex + "; -fx-background-radius: 5 0 0 5;");
+
+        // 2. Contenido
+        VBox contenido = new VBox(3);
+        contenido.setPadding(new Insets(8, 12, 8, 12));
+        
+        Text titulo = new Text(cita.getPaciente().getNombre() + " (" + cita.getPaciente().getEspecie() + ")");
+        titulo.setFont(Font.font("System", FontWeight.BOLD, 14));
+        titulo.setFill(Color.web("#37474F"));
+        
+        // Usamos getDuenio() (o getDniDueno() si lo cambiaste en Paciente)
+        // Nota: Si en Paciente el método es getDniDueno(), cámbialo aquí.
+        // Asumo getDuenio() porque en el DAO estábamos guardando el nombre ahí.
+        String textoDetalle = "Dueño: " + cita.getPaciente().getDniDueno() + " • " + cita.getTipoCita();
+        
+        Label detalle = new Label(textoDetalle);
+        detalle.setTextFill(Color.web("#78909C"));
+        detalle.setFont(Font.font("System", 12));
+        
+        contenido.getChildren().addAll(titulo, detalle);
+        tarjeta.getChildren().addAll(barraColor, contenido);
+        return tarjeta;
     }
 }

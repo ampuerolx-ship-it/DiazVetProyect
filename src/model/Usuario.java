@@ -5,7 +5,7 @@ public class Usuario {
     private String password;
     private String dniCliente;
     private String rol;
-    private String fotoPerfilRuta; // <--- Campo clave para la foto de perfil
+    private String fotoPerfilRuta;
 
     public Usuario(String nickname, String password, String dniCliente, String rol, String fotoPerfilRuta) {
         this.nickname = nickname;

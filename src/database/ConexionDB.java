@@ -87,6 +87,14 @@ public class ConexionDB {
                     "stock INTEGER, " +
                     "categoria TEXT" + // Ej: Alimento, Juguete, Medicina
                     ");";
+            
+            // 7. Nueva Tabla: VENTAS (Para el Dashboard)
+            String sqlVentas = "CREATE TABLE IF NOT EXISTS ventas (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "fecha_hora TEXT DEFAULT CURRENT_TIMESTAMP, " + // Automático
+                    "total REAL NOT NULL, " +
+                    "usuario_responsable TEXT" +
+                    ");";
 
             // --- EJECUTAR CREACIÓN DE TABLAS ---
             stmt.execute(sqlClientes);
@@ -95,16 +103,14 @@ public class ConexionDB {
             stmt.execute(sqlHistoriales);
             stmt.execute(sqlCitas);
             stmt.execute(sqlProductos);
-            
-            // --- ACTUALIZACIONES PARA BASES DE DATOS EXISTENTES (Migraciones) ---
-            // Si el archivo .db ya existía sin estas columnas, esto las agrega sin borrar datos
+            stmt.execute(sqlVentas);
+
+            try { stmt.execute("ALTER TABLE ventas ADD COLUMN fecha_hora TEXT DEFAULT CURRENT_TIMESTAMP;"); } catch (SQLException e) {}
             try { stmt.execute("ALTER TABLE clientes ADD COLUMN correo TEXT;"); } catch (SQLException e) {}
             try { stmt.execute("ALTER TABLE mascotas ADD COLUMN foto_mascota_ruta TEXT;"); } catch (SQLException e) {}
             try { stmt.execute("ALTER TABLE historiales ADD COLUMN registro_vacunas_ruta TEXT;"); } catch (SQLException e) {}
-
-            try { stmt.execute("ALTER TABLE productos ADD COLUMN categoria TEXT;"); } catch (SQLException e) { 
-                // Esto es normal si la columna ya existe, por eso usamos el try-catch.
-            }
+            try { stmt.execute("ALTER TABLE mascotas ADD COLUMN fecha_registro TEXT DEFAULT CURRENT_DATE;"); } catch (SQLException e) {}
+            try { stmt.execute("ALTER TABLE productos ADD COLUMN categoria TEXT;"); } catch (SQLException e) {}
             
             // Insertar productos de prueba si la tabla está vacía
             String sqlDataPrueba = "INSERT OR IGNORE INTO productos (codigo, nombre, descripcion, precio, stock, categoria) VALUES " +

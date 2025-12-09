@@ -1,29 +1,68 @@
 package controller;
 
+import database.dao.ClienteDAO; 
+import database.dao.HistorialDAO;
 import database.ConexionDB;
 import model.Cliente;
 import model.Mascotas;
 import model.Usuario;
+import utilidades.Validador;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+
+import javafx.scene.control.TextField;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.Label;
+import java.io.File;
+import java.time.format.DateTimeFormatter;
 
 public class RegistroTransaccionalController {
+    
+    private ClienteDAO clienteDAO = new ClienteDAO();
+    private HistorialDAO historialDAO = new HistorialDAO();
+    
+    @FXML private TextField txtDni;
+    @FXML private TextField txtNombres;
+    @FXML private TextField txtApellidos;
+    @FXML private TextField txtTelefono;
+    @FXML private TextField txtDireccion;
+    @FXML private TextField txtCorreo;
+    
+    @FXML private TextField txtMascotaNombre;
+    @FXML private ComboBox<String> cmbMascotaEspecie;
+    @FXML private TextField txtMascotaRaza;
+    @FXML private TextField txtMascotaEdad;
+    @FXML private TextField txtMascotaPeso;
+    @FXML private Label lblFotoMascotaRuta;
+    
+    @FXML private TextField txtNickname;
+    @FXML private TextField txtPassword;
+    @FXML private TextField txtRol;
 
+    private final Validador validador = new Validador();
+    
     /**
      * Realiza el registro completo de las 3 entidades en una sola transacción.
      */
-    public boolean registrarCompleto(Usuario usuario, Cliente cliente, Mascotas mascota) {
+    public boolean registrarCompleto(Usuario usuario, Cliente cliente, Mascotas mascota) 
+    {
         Connection conn = null;
+        int idMascotaGenerado = -1;
         
         try {
             conn = ConexionDB.conectar();
+            if (conn == null) throw new SQLException("Fallo al conectar a la BD.");
             conn.setAutoCommit(false);
 
             // 1. REGISTRAR CLIENTE
-            String sqlCliente = "INSERT INTO clientes(dni, nombres, apellidos, telefono, direccion) VALUES(?,?,?,?,?)";
+            String sqlCliente = "INSERT INTO clientes(dni, nombres, apellidos, telefono, direccion) VALUES(?,?,?,?,?,?)";
             
             try (PreparedStatement pstC = conn.prepareStatement(sqlCliente)) {
                 pstC.setString(1, cliente.getDni());
@@ -31,6 +70,7 @@ public class RegistroTransaccionalController {
                 pstC.setString(3, cliente.getApellidos());
                 pstC.setString(4, cliente.getTelefono());
                 pstC.setString(5, cliente.getDireccion());
+                pstC.setString(6, cliente.getCorreo());
                 pstC.executeUpdate();
             }
 
@@ -48,7 +88,6 @@ public class RegistroTransaccionalController {
 
             // 3. REGISTRAR MASCOTA
             String sqlMascota = "INSERT INTO mascotas(nombre, especie, raza, edad, peso, dni_cliente, foto_mascota_ruta) VALUES(?,?,?,?,?,?,?)";
-            int idMascotaGenerado = -1;
             
             try (PreparedStatement pstM = conn.prepareStatement(sqlMascota, Statement.RETURN_GENERATED_KEYS)) {
                 pstM.setString(1, mascota.getNombre());
@@ -56,13 +95,17 @@ public class RegistroTransaccionalController {
                 pstM.setString(3, mascota.getRaza());
                 pstM.setInt(4, mascota.getEdad());
                 pstM.setDouble(5, mascota.getPeso());
-                pstM.setString(6, cliente.getDni()); // FK
+                pstM.setString(6, cliente.getDni());
                 pstM.setString(7, mascota.getFotoMascotaRuta());
-                pstM.executeUpdate();
+                int affectedRows = pstM.executeUpdate();
+                if (affectedRows == 0) throw new SQLException("Fallo al crear mascota, no se generó ID.");
                 
-                ResultSet rs = pstM.getGeneratedKeys();
-                if (rs.next()) {
-                    idMascotaGenerado = rs.getInt(1);
+                try (ResultSet generatedKeys = pstM.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        idMascotaGenerado = generatedKeys.getInt(1);
+                    } else {
+                        throw new SQLException("Fallo al obtener ID de la mascota.");
+                    }
                 }
             }
 
@@ -74,7 +117,7 @@ public class RegistroTransaccionalController {
                     pstH.executeUpdate();
                 }
             }
-
+  
             conn.commit(); // CONFIRMAR TRANSACCIÓN
             System.out.println("Registro transaccional exitoso.");
             return true;

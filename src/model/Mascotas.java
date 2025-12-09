@@ -7,8 +7,8 @@ public class Mascotas {
     private String raza;
     private int edad;
     private double peso;
-    private String dniCliente;     // Relación con el Cliente
-    private String fotoMascotaRuta; // Ruta de la imagen en el disco
+    private String dniCliente;  
+    private String fotoMascotaRuta;
 
     // Constructor completo para recuperación de BD
     public Mascotas(int id, String nombre, String especie, String raza, int edad, double peso, String dniCliente) {
@@ -19,6 +19,7 @@ public class Mascotas {
         this.edad = edad;
         this.peso = peso;
         this.dniCliente = dniCliente;
+        this.fotoMascotaRuta = fotoMascotaRuta;
     }
 
     // Constructor simple para registro nuevo (sin ID aún)
@@ -29,6 +30,7 @@ public class Mascotas {
         this.edad = edad;
         this.peso = peso;
         this.dniCliente = dniCliente;
+        this.fotoMascotaRuta = fotoMascotaRuta;
     }
 
     // --- Getters y Setters ---

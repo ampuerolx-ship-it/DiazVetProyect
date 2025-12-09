@@ -1,6 +1,8 @@
 package controller;
 
 import database.dao.ProductoDAO;
+import database.ConexionDB;
+import database.dao.ProductoDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,6 +13,7 @@ import utilidades.RecomendadorPack;
 import java.util.Stack;
 import java.util.List;
 import java.util.Optional;
+import java.sql.*;
 
 public class PetShopController {
 
@@ -119,7 +122,8 @@ public class PetShopController {
         if (pilaCarrito.isEmpty()) return;
         
         boolean exito = true;
-        // Aquí hacemos el commit real a la base de datos
+        double montoFinalVenta = totalVenta;
+        
         while(!pilaCarrito.isEmpty()){
             Producto p = pilaCarrito.pop();
             if(!productoDAO.actualizarStock(p.getCodigo(), 1)){
@@ -128,10 +132,28 @@ public class PetShopController {
         }
         
         if(exito){
+            String sqlVenta = "INSERT INTO ventas (total) VALUES (?)";
+            try (Connection conn = ConexionDB.conectar(); 
+                PreparedStatement pst = conn.prepareStatement(sqlVenta)) {
+
+                pst.setDouble(1, montoFinalVenta); 
+                pst.executeUpdate();
+
+                mostrarAlerta("Venta Exitosa", "La venta se ha registrado por S/ " + montoFinalVenta);
+                totalVenta = 0;
+                actualizarVistaCarrito();
+                cargarProductos();
+
+            } catch (SQLException e) { 
+                e.printStackTrace();
+                mostrarAlerta("Error Crítico", "Se actualizó el stock pero falló al guardar el historial de venta.");
+            }
+            
+            /*
             mostrarAlerta("Venta Exitosa", "La venta se ha registrado y el stock actualizado.");
             totalVenta = 0;
             actualizarVistaCarrito();
-            cargarProductos(); // Recargar desde BD para asegurar consistencia
+            cargarProductos(); // Recargar desde BD para asegurar consistencia*/
         } else {
             mostrarAlerta("Error", "Hubo un problema al actualizar el stock.");
         }

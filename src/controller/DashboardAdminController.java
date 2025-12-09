@@ -1,9 +1,10 @@
 package controller;
 
+import database.dao.DashboardDAO;
 import javafx.animation.ScaleTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
+import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -12,6 +13,11 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
+import javafx.scene.control.*;
+
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.util.Duration;
 
 import javafx.fxml.FXML;
@@ -48,7 +54,11 @@ public class DashboardAdminController {
     
     // Contenedor de accesos rápidos para buscar sus botones hijos
     @FXML private GridPane gridAccesosRapidos; // Necesitarías añadir este fx:id al GridPane en el FXML si quieres animar los botones de acceso rápido automáticamente
-
+    
+    private Timeline refreshTimeline;
+    // DAO
+    private final DashboardDAO dashboardDAO = new DashboardDAO();
+    
     @FXML
     public void initialize() {
         // 1. Aplicar Animaciones 3D Hover a las tarjetas
@@ -56,88 +66,102 @@ public class DashboardAdminController {
         aplicarEfectoHover3D(cardPacientes);
         aplicarEfectoHover3D(cardVentas);
         aplicarEfectoHover3D(cardInventario);
-
-        // 2. Cargar Datos Simulados (Mock Data)
-        cargarDatosSimulados();
         
-        // 3. Configurar las Listas para que se vean bien
+        // 2. Configurar las Listas para que se vean bien
         configurarListas();
+        startRefresh();
+        // 3. Cargar Datos Reales
+        cargarDatosReales();
+    }
+    
+    private void cargarDatosReales() {
+        // Usamos un Task de JavaFX para hacer las consultas a BD en otro hilo
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                // Consultas a BD (son rápidas en SQLite, pero es buena práctica)
+                int citasHoy = dashboardDAO.contarCitasHoy();
+                int pacientesMes = dashboardDAO.contarPacientesNuevosMes();
+                double ventasDia = dashboardDAO.sumarVentasDia();
+                int stockBajo = dashboardDAO.contarAlertasStock();
+                ObservableList<String> proximas = dashboardDAO.obtenerProximasCitas();
+
+                // Actualizar UI en el hilo principal
+                javafx.application.Platform.runLater(() -> {
+                    lblCitasHoy.setText(String.valueOf(citasHoy));
+                    lblPacientesNuevos.setText(String.valueOf(pacientesMes));
+                    lblVentasDia.setText(String.format("S/. %.2f", ventasDia));
+                    lblAlertasStock.setText(String.valueOf(stockBajo));
+                    
+                    // Alertas visuales de color
+                    if (stockBajo > 0) lblAlertasStock.setStyle("-fx-text-fill: #EF5350;"); 
+                    else lblAlertasStock.setStyle("-fx-text-fill: #66BB6A;");
+
+                    listProximasCitas.setItems(proximas);
+                    
+                    // Nota: Para actividad reciente, podrías crear una consulta similar
+                    // o mantener mensajes estáticos del sistema por ahora.
+                    listActividadReciente.getItems().add("✅ Sistema sincronizado con BD");
+                });
+                return null;
+            }
+        };
+        
+        new Thread(task).start();
     }
 
-    // Método reutilizable para cambiar vistas
+    private void startRefresh() {
+        // Ejecutar inmediatamente al inicio
+        cargarDatosReales(); 
+
+        // Configurar el Timeline para refrescar cada 30 segundos
+        if (refreshTimeline != null) {
+            refreshTimeline.stop(); // Prevenir duplicados si se llama de nuevo
+        }
+
+        refreshTimeline = new Timeline(
+            new KeyFrame(Duration.seconds(30), e -> cargarDatosReales())
+        );
+        refreshTimeline.setCycleCount(Timeline.INDEFINITE); // Ciclo infinito
+        refreshTimeline.play();
+    }
+    
     private void cambiarVistaCentral(String fxmlPath) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent nuevaVista = loader.load();
-            mainLayout.setCenter(nuevaVista); // Reemplaza el contenido del centro (el Dashboard) por la nueva vista
+            mainLayout.setCenter(nuevaVista);
         } catch (IOException e) {
             e.printStackTrace();
-            // System.err.println("Error cargando la vista: " + fxmlPath);
             mainLayout.setCenter(new javafx.scene.control.Label("ERROR: No se pudo cargar la vista " + fxmlPath));
         }
     }
     
-    // Acción para el botón Pet Shop
     @FXML
     private void mostrarVistaPetShop(ActionEvent event) {
         cambiarVistaCentral("/view/panels/PanelPetShop.fxml");
     }
 
-    /**
-     * Aplica una transición de escala y eleva la sombra al pasar el mouse.
-     */
     private void aplicarEfectoHover3D(Node node) {
-        // Sombra original más suave
         DropShadow normalShadow = new DropShadow(30, 0, 10, Color.rgb(144, 202, 249, 0.25));
-        // Sombra al hacer hover: más intensa y desplazada hacia abajo (efecto de elevación)
         DropShadow hoverShadow = new DropShadow(40, 0, 15, Color.rgb(144, 202, 249, 0.4));
-
-        // Transición para agrandar ligeramente el nodo
         ScaleTransition scaleIn = new ScaleTransition(Duration.millis(200), node);
-        scaleIn.setToX(1.03); // Escalar al 103%
+        scaleIn.setToX(1.03);
         scaleIn.setToY(1.03);
-
         ScaleTransition scaleOut = new ScaleTransition(Duration.millis(200), node);
-        scaleOut.setToX(1.0); // Volver al 100%
+        scaleOut.setToX(1.0);
         scaleOut.setToY(1.0);
 
-        // Eventos del Mouse
         node.setOnMouseEntered(e -> {
-            node.setEffect(hoverShadow); // Cambiar sombra
-            scaleIn.playFromStart(); // Reproducir animación de entrada
-            node.setStyle("-fx-cursor: hand;"); // Cambiar cursor
+            node.setEffect(hoverShadow);
+            scaleIn.playFromStart(); 
+            node.setStyle("-fx-cursor: hand;");
         });
 
         node.setOnMouseExited(e -> {
-            node.setEffect(normalShadow); // Restaurar sombra
-            scaleOut.playFromStart(); // Reproducir animación de salida
+            node.setEffect(normalShadow); 
+            scaleOut.playFromStart(); 
         });
-    }
-
-    private void cargarDatosSimulados() {
-        // Aquí conectarías con tus DAOs reales más adelante
-        lblCitasHoy.setText("24");
-        lblPacientesNuevos.setText("52");
-        lblVentasDia.setText("S/. 1,850.00");
-        lblAlertasStock.setText("5");
-
-        // Datos para próximas citas
-        ObservableList<String> citas = FXCollections.observableArrayList(
-            "10:30 AM - Firulais (Vacuna) - Dra. Ana",
-            "11:00 AM - Michi (Revisión) - Dr. Juan",
-            "11:45 AM - Rocco (Rayos X) - Dra. Ana",
-            "01:00 PM - Luna (Emergencia) - Dr. Juan"
-        );
-        listProximasCitas.setItems(citas);
-
-        // Datos para actividad reciente
-        ObservableList<String> actividad = FXCollections.observableArrayList(
-            "✅ Venta #1024 registrada por Laura (S/ 150.00)",
-            "🐾 Nuevo paciente 'Thor' registrado",
-            "📦 Stock de 'Croquetas Dog Chow' actualizado (Bajo)",
-            "📅 Cita para 'Lola' reagendada para mañana"
-        );
-        listActividadReciente.setItems(actividad);
     }
     
     private void configurarListas() {
@@ -153,12 +177,10 @@ public class DashboardAdminController {
                     setText(item);
                     getStyleClass().add("activity-list-cell");
                     setStyle("-fx-font-size: 14px; -fx-padding: 10;");
-                     // Podrías añadir iconos aquí dependiendo del texto
                 }
             }
         });
-        
-        // Repetir para la otra lista o crear una factory compartida
+
          listActividadReciente.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -185,26 +207,19 @@ public class DashboardAdminController {
         Optional<ButtonType> result = alert.showAndWait();
         
         if (result.isPresent() && result.get() == ButtonType.OK) {
+            if (refreshTimeline != null) {
+                refreshTimeline.stop(); // ⬅️ Detener el refresh al salir
+            }
             try {
-                // 1. Obtener y cerrar la ventana actual (Dashboard)
                 Stage currentStage = (Stage) mainLayout.getScene().getWindow();
                 currentStage.close();
-
-                // 2. USAR REFLECTION para cargar "LoginAppMain" sin importarlo
-                // Buscamos la clase por su nombre exacto
                 Class<?> loginClass = Class.forName("LoginAppMain");
-                
-                // 3. Crear una nueva instancia de esa clase
-                // Esto equivale a hacer: new LoginAppMain()
                 javafx.application.Application loginApp = (javafx.application.Application) loginClass.getDeclaredConstructor().newInstance();
-                
-                // 4. Llamar manualmente al método start() con un nuevo Stage
                 Stage newLoginStage = new Stage();
                 loginApp.start(newLoginStage);
 
             } catch (Exception e) {
                 e.printStackTrace();
-                // En caso de error, mostramos una alerta
                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                 errorAlert.setTitle("Error");
                 errorAlert.setContentText("No se pudo reiniciar la sesión: " + e.getMessage());
